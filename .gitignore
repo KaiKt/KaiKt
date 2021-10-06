@@ -1,0 +1,10 @@
+
+# IDEA
+mainModule.iml
+/.idea
+
+# Maven
+/target
+
+# Runtime & Debug
+latest.log
