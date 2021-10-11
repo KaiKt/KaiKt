@@ -158,13 +158,13 @@ class TestClient {
 	@Subscribe
 	fun guildUserJoined(event: GuildUserJoinedEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("欢迎 ${event.user.kView.nickname}")
+		event.guild.channels.first { it.isCategory != true }.sendMessage("欢迎 ${event.user.kView.data.nickname}")
 	}
 
 	@Subscribe
 	fun guildUserExited(event: GuildUserExitedEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("再见 ${event.user.kView.username}")
+		event.guild.channels.first { it.isCategory != true }.sendMessage("再见 ${event.user.kView.data.username}")
 	}
 
 	@Subscribe

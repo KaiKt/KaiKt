@@ -14,14 +14,14 @@ data class HGuild(
 
 	// KaiKt
 
-	val kView get() = api.Guild().getGuildView(guildId)
+	val kView get() = api.Guild().getGuildView(guildId).data
 	val kGuildMutes get() = api.Guild().getGuildMuteList(guildId)
 
 	// Hazelnut
 
-	val users get() = api.Guild().getGuildUserList(guildId).items.map { it.toHUser(api, this) }
-	val channels get() = api.Channel().getChannelList(guildId).map { it.toHChannel(api, this) }
-	val roles get() = api.GuildRole().getGuildRoleList(guildId).map { it.toHRole(api) }
+	val users get() = api.Guild().getGuildUserList(guildId).data.items.map { it.toHUser(api, this) }
+	val channels get() = api.Channel().getChannelList(guildId).data.items.map { it.toHChannel(api, this) }
+	val roles get() = api.GuildRole().getGuildRoleList(guildId).data.items.map { it.toHRole(api) }
 
 	fun changeUserDisplayName(name: String, user: HUser) = user.changeGuildDisplayName(name, this)
 
@@ -30,7 +30,7 @@ data class HGuild(
 	fun createGuildMute(user: HUser, type: Int) = api.Guild().postGuildMuteCreate(guildId, user.userId, type)
 	fun deleteGuildMute(user: HUser, type: Int) = api.Guild().postGuildMuteDelete(guildId, user.userId, type)
 
-	fun createChannel(name: String, type: KChannelType) = api.Channel().postChannelCreate(guildId, name) { setType(type) }.toHChannel(api, this)
+	fun createChannel(name: String, type: KChannelType) = api.Channel().postChannelCreate(guildId, name) { setType(type) }.data.toHChannel(api, this)
 	fun deleteChannel(channel: HChannel) = channel.delete()
 
 	fun grantRole(user: HUser, role: HRole) = api.GuildRole().postGuildRoleGrant(guildId, user.userId, role.roleId)

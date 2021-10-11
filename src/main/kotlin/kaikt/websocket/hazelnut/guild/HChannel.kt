@@ -27,7 +27,7 @@ data class HChannel(
 
 	fun sendMessage(content: String, quote: HGuildMessage? = null): HGuildMessage {
 		val create = api.Message().postMessageCreate(channelId, content) { this.quote = quote?.messageId }
-		return HGuildMessage(api, 1, this, create.msgId, content, api.me.toHUser(api, guild))
+		return HGuildMessage(api, 1, this, create.data.msgId, content, api.me.toHUser(api, guild))
 	}
 
 }

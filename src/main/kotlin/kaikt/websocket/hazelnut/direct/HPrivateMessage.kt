@@ -24,7 +24,7 @@ data class HPrivateMessage(
 			this.quote = messageId
 			this.type = type
 		}
-		return HPrivateMessage(api, type?.i ?: 1, chat, create.msgId, content, chat.me)
+		return HPrivateMessage(api, type?.i ?: 1, chat, create.data.msgId, content, chat.me)
 	}
 
 	fun delete() {

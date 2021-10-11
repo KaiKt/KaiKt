@@ -25,7 +25,7 @@ data class HGuildMessage(
 			this.quote = messageId
 			this.type = type
 		}
-		return HGuildMessage(api, type?.i ?: 1, channel, create.msgId, content, api.me.toHUser(api, channel.guild))
+		return HGuildMessage(api, type?.i ?: 1, channel, create.data.msgId, content, api.me.toHUser(api, channel.guild))
 	}
 
 	fun delete() {

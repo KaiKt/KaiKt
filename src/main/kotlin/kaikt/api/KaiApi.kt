@@ -125,26 +125,26 @@ class KaiApi(private val token: KToken) {
 	}
 
 	val me
-		get() = User().getUserMe()
+		get() = User().getUserMe().data
 
 	val meUser
-		get() = User().getUserMe().toHUser(this)
+		get() = User().getUserMe().data.toHUser(this)
 
 	inner class Guild {
 
 		/**
 		 * 获取当前用户加入的服务器列表
 		 */
-		fun getGuildList(): List<KGuildDefinition> {
-			return doGet("/api/v3/guild/list").toJson().getData().getTypedList()
+		fun getGuildList(): KListResponse<KGuildDefinition> {
+			return doGet("/api/v3/guild/list").toJson().getTyped()
 		}
 
 		/**
 		 * 获取服务器详情
 		 * @param guildId 服务器ID
 		 */
-		fun getGuildView(guildId: String): KGuildViewDefinition {
-			return doGet("/api/v3/guild/view", "guild_id" map guildId).toJson().getData().getTyped()
+		fun getGuildView(guildId: String): KResponse<KGuildViewDefinition> {
+			return doGet("/api/v3/guild/view", "guild_id" map guildId).toJson().getTyped()
 		}
 
 		/**
@@ -152,11 +152,11 @@ class KaiApi(private val token: KToken) {
 		 * @param guildId 服务器ID
 		 * @param conf 请求设置
 		 */
-		fun getGuildUserList(guildId: String, conf: KGuildUserListRequest.() -> Unit = {}): KGuildUserListData {
+		fun getGuildUserList(guildId: String, conf: KGuildUserListRequest.() -> Unit = {}): KResponse<KGuildUserListData> {
 			return doGet(
 				"/api/v3/guild/user-list",
 				KGuildUserListRequest(guildId).apply(conf).toQueryMap()
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -206,14 +206,14 @@ class KaiApi(private val token: KToken) {
 		 * 服务器静音列表
 		 * @param guildId 服务器ID
 		 */
-		fun getGuildMuteList(guildId: String, returnType: String = "detail"): KGuildMuteListData {
+		fun getGuildMuteList(guildId: String, returnType: String = "detail"): KResponse<KGuildMuteListData> {
 			return doGet(
 				"/api/v3/guild-mute/list",
 				valueNotNullMapOf(
 					"guild_id" to guildId,
 					"return_type" to returnType
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -267,25 +267,25 @@ class KaiApi(private val token: KToken) {
 		 * @param guildId 服务器ID
 		 * @param type 频道类型；1-文字，2-语音
 		 */
-		fun getChannelList(guildId: String, type: KChannelType? = null): List<KChannelDefinition> {
+		fun getChannelList(guildId: String, type: KChannelType? = null): KListResponse<KChannelDefinition> {
 			return doGet(
 				"/api/v3/channel/list",
 				valueNotNullMapOf(
 					"guild_id" to guildId,
 					"type" to type?.type
 				)
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
 		 * 获取频道详细信息
 		 * @param channelId 频道ID
 		 */
-		fun getChannelView(channelId: String): KChannelViewDefinition {
+		fun getChannelView(channelId: String): KResponse<KChannelViewDefinition> {
 			return doGet(
 				"/api/v3/channel/view",
 				"target_id" map channelId
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -298,12 +298,12 @@ class KaiApi(private val token: KToken) {
 			guildId: String,
 			name: String,
 			request: KChannelCreateRequest.() -> Unit = {}
-		): KChannelViewDefinition {
+		): KResponse<KChannelViewDefinition> {
 			val body = KChannelCreateRequest(guildId, name).apply(request).body
 			return doPost(
 				"/api/v3/channel/create",
 				body
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -336,11 +336,11 @@ class KaiApi(private val token: KToken) {
 		 * 频道身分组权限详细信息
 		 * @param channelId 频道ID
 		 */
-		fun getChannelRoleIndex(channelId: String): KChannelRoleIndexData {
+		fun getChannelRoleIndex(channelId: String): KResponse<KChannelRoleIndexData> {
 			return doGet(
 				"/api/v3/channel-role/index",
 				"channel_id" map channelId
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -371,7 +371,7 @@ class KaiApi(private val token: KToken) {
 			roleIdOrUserId: RoleIdOrUserId,
 			allow: Int? = null,
 			deny: Int? = null
-		): KChannelRoleUpdateData {
+		): KResponse<KChannelRoleUpdateData> {
 			return doPost(
 				"/api/v3/channel-role/update",
 				valueNotNullMapOf(
@@ -381,7 +381,7 @@ class KaiApi(private val token: KToken) {
 					"allow" to allow,
 					"deny" to deny
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -409,12 +409,12 @@ class KaiApi(private val token: KToken) {
 		 * @param channelId 频道ID
 		 * @param request 查询细节设置
 		 */
-		fun getMessageList(channelId: String, request: KMessageListRequest.() -> Unit = {}): List<KMessageDefinition> {
+		fun getMessageList(channelId: String, request: KMessageListRequest.() -> Unit = {}): KListResponse<KMessageDefinition> {
 			val query = KMessageListRequest(channelId).apply(request).query
 			return doGet(
 				"/api/v3/message/list",
 				query
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -427,12 +427,12 @@ class KaiApi(private val token: KToken) {
 			channelId: String,
 			content: String,
 			request: KMessageCreateRequest.() -> Unit = {}
-		): KMessageCreateData {
+		): KResponse<KMessageCreateData> {
 			val body = KMessageCreateRequest(channelId, content).apply(request).body
 			return doPost(
 				"/api/v3/message/create",
 				body
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -469,16 +469,14 @@ class KaiApi(private val token: KToken) {
 		 * @param msgId 消息ID
 		 * @param emoji 表情ID
 		 */
-		fun getMessageReactionList(msgId: String, emoji: String): List<KUserDefinition> {
+		fun getMessageReactionList(msgId: String, emoji: String): KBuggedListResponse<KUserDefinition> {
 			return doGet(
 				"/api/v3/message/reaction-list",
 				mapOf(
 					"msg_id" to msgId,
 					"emoji" to emoji
 				) // 这tm铁是开黑啦的问题，还有下面那个 [getDirectMessageReactionList]
-			).toJson().getAsJsonArray("data").let {
-				gson.fromJson(it, (object : TypeToken<List<KUserDefinition>>() {}.type))
-			}
+			).toJson().getTyped()
 		}
 
 		/**
@@ -522,36 +520,36 @@ class KaiApi(private val token: KToken) {
 		 * @param page 目标页数
 		 * @param pageSize 每页数据量
 		 */
-		fun getUserChatList(page: Int? = null, pageSize: Int? = null): List<KUserChatDefinition> {
+		fun getUserChatList(page: Int? = null, pageSize: Int? = null): KListResponse<KUserChatDefinition> {
 			return doGet(
 				"/api/v3/user-chat/list",
 				valueNotNullMapOf(
 					"page" to page,
 					"page_size" to pageSize
 				)
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
 		 * 获取私聊详细信息
 		 * @param chatCode 私聊ID
 		 */
-		fun getUserChatView(chatCode: String): KUserChatViewDefinition {
+		fun getUserChatView(chatCode: String): KResponse<KUserChatViewDefinition> {
 			return doGet(
 				"/api/v3/user-chat/view",
 				"chat_code" map chatCode
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
 		 * 发起私聊
 		 * @param userId 私聊目标用户ID
 		 */
-		fun postUserChatCreate(userId: String): KUserChatViewDefinition {
+		fun postUserChatCreate(userId: String): KResponse<KUserChatViewDefinition> {
 			return doPost(
 				"/api/v3/user-chat/create",
 				("target_id" map userId).toJson()
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -577,12 +575,12 @@ class KaiApi(private val token: KToken) {
 		fun getDirectMessageList(
 			targetIdOrChatCode: TargetIdOrChatCode,
 			request: KDirectMessageRequest.() -> Unit = {}
-		): List<KMessageDefinition> {
+		): KListResponse<KMessageDefinition> {
 			val query = KDirectMessageRequest(targetIdOrChatCode).apply(request).query
 			return doGet(
 				"/api/v3/direct-message/list",
 				query
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -595,12 +593,12 @@ class KaiApi(private val token: KToken) {
 			targetIdOrChatCode: TargetIdOrChatCode,
 			content: String,
 			request: KDirectMessageCreateRequest.() -> Unit = {}
-		): KMessageCreateData {
+		): KResponse<KMessageCreateData> {
 			val body = KDirectMessageCreateRequest(targetIdOrChatCode, content).apply(request).body
 			return doPost(
 				"/api/v3/direct-message/create",
 				body
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -687,8 +685,8 @@ class KaiApi(private val token: KToken) {
 		/**
 		 * 获取网关连接地址（用于 WebSocket 方式）
 		 */
-		fun getGateway(): KGatewayData {
-			return doGet("/api/v3/gateway/index").toJson().getData().getTyped()
+		fun getGateway(): KResponse<KGatewayData> {
+			return doGet("/api/v3/gateway/index").toJson().getTyped()
 		}
 
 	}
@@ -698,8 +696,8 @@ class KaiApi(private val token: KToken) {
 		/**
 		 * 获取当前登录的用户的信息
 		 */
-		fun getUserMe(): KUserDefinition {
-			return doGet("/api/v3/user/me").toJson().getData().getTyped()
+		fun getUserMe(): KResponse<KUserDefinition> {
+			return doGet("/api/v3/user/me").toJson().getTyped()
 		}
 
 		/**
@@ -707,14 +705,14 @@ class KaiApi(private val token: KToken) {
 		 * @param userId 目标用户ID
 		 * @param guildId 服务器ID
 		 */
-		fun getUserView(userId: String, guildId: String? = null): KUserDefinition {
+		fun getUserView(userId: String, guildId: String? = null): KResponse<KUserDefinition> {
 			return doGet(
 				"/api/v3/user/view",
 				valueNotNullMapOf(
 					"user_id" to userId,
 					"guild_id" to guildId
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 	}
@@ -733,7 +731,7 @@ class KaiApi(private val token: KToken) {
 		 * @param page 目标页数
 		 * @param pageSize 每页数据量
 		 */
-		fun getGuildRoleList(guildId: String, page: Int? = null, pageSize: Int? = null): List<KRoleDefinition> {
+		fun getGuildRoleList(guildId: String, page: Int? = null, pageSize: Int? = null): KListResponse<KRoleDefinition> {
 			return doGet(
 				"/api/v3/guild-role/list",
 				valueNotNullMapOf(
@@ -741,7 +739,7 @@ class KaiApi(private val token: KToken) {
 					"page" to page,
 					"page_size" to pageSize
 				)
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -749,14 +747,14 @@ class KaiApi(private val token: KToken) {
 		 * @param guildId 服务器ID
 		 * @param name 身分组名称（默认“新角色”）
 		 */
-		fun postGuildRoleCreate(guildId: String, name: String? = null): KRoleDefinition {
+		fun postGuildRoleCreate(guildId: String, name: String? = null): KResponse<KRoleDefinition> {
 			return doPost(
 				"/api/v3/guild-role/create",
 				valueNotNullMapOf(
 					"guild_id" to guildId,
 					"name" to name
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -769,12 +767,12 @@ class KaiApi(private val token: KToken) {
 			guildId: String,
 			roleId: String,
 			request: KGuildRoleUpdateRequest.() -> Unit = {}
-		): KRoleDefinition {
+		): KResponse<KRoleDefinition> {
 			val body = KGuildRoleUpdateRequest(guildId, roleId).apply(request).body
 			return doPost(
 				"/api/v3/guild-role/update",
 				body
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -798,7 +796,7 @@ class KaiApi(private val token: KToken) {
 		 * @param userId 用户ID
 		 * @param roleId 身分组ID
 		 */
-		fun postGuildRoleGrant(guildId: String, userId: String, roleId: String): KGuildRoleGrantRevokeData {
+		fun postGuildRoleGrant(guildId: String, userId: String, roleId: String): KResponse<KGuildRoleGrantRevokeData> {
 			return doPost(
 				"/api/v3/guild-role/grant",
 				mapOf(
@@ -806,7 +804,7 @@ class KaiApi(private val token: KToken) {
 					"user_id" to userId,
 					"role_id" to roleId
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -815,7 +813,7 @@ class KaiApi(private val token: KToken) {
 		 * @param userId 用户ID
 		 * @param roleId 身分组
 		 */
-		fun postGuildRoleRevoke(guildId: String, userId: String, roleId: String): KGuildRoleGrantRevokeData {
+		fun postGuildRoleRevoke(guildId: String, userId: String, roleId: String): KResponse<KGuildRoleGrantRevokeData> {
 			return doPost(
 				"/api/v3/guild-role/revoke",
 				mapOf(
@@ -823,7 +821,7 @@ class KaiApi(private val token: KToken) {
 					"user_id" to userId,
 					"role_id" to roleId
 				)
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 	}
@@ -834,11 +832,11 @@ class KaiApi(private val token: KToken) {
 		 * 获取服务器表情列表
 		 * @param guildId 服务器ID
 		 */
-		fun getGuildEmojiList(guildId: String): List<KGuildEmojiDefinition> {
+		fun getGuildEmojiList(guildId: String): KListResponse<KGuildEmojiDefinition> {
 			return doGet(
 				"/api/v3/guild-emoji/list",
 				"guild_id" map guildId
-			).toJson().getData().getTypedList()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -848,7 +846,7 @@ class KaiApi(private val token: KToken) {
 		 * @param name 表情名称
 		 */
 		@WorkInProgress
-		fun postGuildEmojiCreate(guildId: String, emoji: File, name: String): KGuildEmojiCreateData {
+		fun postGuildEmojiCreate(guildId: String, emoji: File, name: String): KResponse<KGuildEmojiCreateData> {
 			return doPost(
 				"/api/v3/guild-emoji/create",
 				MultipartBody.Builder().apply {
@@ -857,7 +855,7 @@ class KaiApi(private val token: KToken) {
 					addFormDataPart("guild_id", guildId)
 					addFormDataPart("emoji", name, emoji.asRequestBody())
 				}.build()
-			).toJson().getData().getTyped()
+			).toJson().getTyped()
 		}
 
 		/**
@@ -905,11 +903,6 @@ private fun Response.toJson(): KaiResponseData = JsonParser.parseReader(this.bod
 	.asResponseData().apply { // 错误检查
 		if(!this.isJsonObject) {
 			throw IllegalStateException("Response must be JsonObject, but currently is ${this.javaClass.simpleName}")
-		} else {
-			val code = this.asJsonObject.getAsJsonPrimitive("code").asInt
-			if(code != 0) {
-				throw IllegalStateException("Error response with code of $code. $this")
-			}
 		}
 	}
 
@@ -938,6 +931,7 @@ private fun JsonElement.asResponseData(): KaiResponseData {
 	}
 }
 
+@Deprecated("移除")
 private fun JsonElement.getData(): KaiResponseData {
 	if(this.isJsonObject && this.asJsonObject.has("data")) {
 		return this.asJsonObject.getAsJsonObject("data")
@@ -955,6 +949,8 @@ private fun JsonObject.getItems(): KaiResponseDataItems {
 }
 
 private inline fun <reified T> KaiResponseData.getTyped(): T = gson.fromJson(this, (object : TypeToken<T>() {}.type))
+
+@Deprecated("-1")
 private inline fun <reified T> KaiResponseData.getTypedList(): T =
 	gson.fromJson(this.getItems(), (object : TypeToken<T>() {}.type))
 

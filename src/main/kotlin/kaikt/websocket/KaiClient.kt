@@ -23,7 +23,7 @@ private val gson = Gson()
 private val logger = LoggerFactory.getLogger("KaiClient")
 
 @OptIn(ExperimentalTime::class, DelicateCoroutinesApi::class)
-open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().getURI()) {
+open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().data.getURI()) {
 
 	val packetBus: EventBus = EventBus.builder().logger(object : Logger {
 		override fun log(level: Level, message: String) = log(level, message, null)

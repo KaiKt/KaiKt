@@ -14,17 +14,17 @@ data class HUser(
 	val bot: Boolean? = null
 ) {
 
-	val kView get() = api.User().getUserView(userId, guild?.guildId)
+	val kView by lazy { api.User().getUserView(userId, guild?.guildId) }
 
 	val chat get(): HUserChat {
 		val chat = api.UserChat().postUserChatCreate(userId)
-		return HUserChat (api, chat.code, api.meUser, this)
+		return HUserChat (api, chat.data.code, api.meUser, this)
 	}
 
-	val joinedGuilds = api.Guild().getGuildList().map { it.toHGuild(api) }
+	val joinedGuilds = api.Guild().getGuildList().data.items.map { it.toHGuild(api) }
 
-	val username get() = kView.username
-	val nickname get() = kView.nickname
+	val username get() = kView.data.username
+	val nickname get() = kView.data.nickname
 
 	fun sendMessage(content: String, quote: String? = null) {
 		api.DirectMessage().postDirectMessageCreate(TargetIdOrChatCode.withTargetId(userId), content) {

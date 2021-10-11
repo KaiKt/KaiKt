@@ -15,7 +15,7 @@ data class HUserChat(
 
 	fun sendMessage(content: String): HPrivateMessage {
 		val create = api.DirectMessage().postDirectMessageCreate(TargetIdOrChatCode.withChatCode(chatCode), content)
-		return HPrivateMessage(api, 1, this, create.msgId, content, me)
+		return HPrivateMessage(api, 1, this, create.data.msgId, content, me)
 	}
 
 }
