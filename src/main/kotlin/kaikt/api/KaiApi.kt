@@ -17,7 +17,6 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.intellij.lang.annotations.MagicConstant
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.net.URLEncoder
 
 private val log = LoggerFactory.getLogger("KaiApi")
 
@@ -144,7 +143,7 @@ class KaiApi(private val token: KToken) {
 		 * @param guildId 服务器ID
 		 */
 		fun getGuildView(guildId: String): KResponse<KGuildViewDefinition> {
-			return doGet("/api/v3/guild/view", "guild_id" map guildId).toJson().getTyped()
+			return doGet("/api/v3/guild/view", mapOf("guild_id" to guildId)).toJson().getTyped()
 		}
 
 		/**
@@ -183,7 +182,7 @@ class KaiApi(private val token: KToken) {
 		fun postGuildLeave(guildId: String): KBasicResponse {
 			return doPost(
 				"/api/v3/guild/leave",
-				("guild_id" map guildId).toJson()
+				mapOf("guild_id" to guildId).toJson()
 			).toJson().getTyped()
 		}
 
@@ -284,7 +283,7 @@ class KaiApi(private val token: KToken) {
 		fun getChannelView(channelId: String): KResponse<KChannelViewDefinition> {
 			return doGet(
 				"/api/v3/channel/view",
-				"target_id" map channelId
+				mapOf("target_id" to channelId)
 			).toJson().getTyped()
 		}
 
@@ -313,7 +312,7 @@ class KaiApi(private val token: KToken) {
 		fun postChannelDelete(channelId: String): KBasicResponse {
 			return doPost(
 				"/api/v3/channel/delete",
-				("channel_id" map channelId).toJson()
+				mapOf("channel_id" to channelId).toJson()
 			).toJson().getTyped()
 		}
 
@@ -339,7 +338,7 @@ class KaiApi(private val token: KToken) {
 		fun getChannelRoleIndex(channelId: String): KResponse<KChannelRoleIndexData> {
 			return doGet(
 				"/api/v3/channel-role/index",
-				"channel_id" map channelId
+				mapOf("channel_id" to channelId)
 			).toJson().getTyped()
 		}
 
@@ -460,7 +459,7 @@ class KaiApi(private val token: KToken) {
 		fun postMessageDelete(msgId: String): KBasicResponse {
 			return doPost(
 				"/api/v3/message/delete",
-				"msg_id" map msgId
+				mapOf("msg_id" to msgId)
 			).toJson().getTyped()
 		}
 
@@ -537,7 +536,7 @@ class KaiApi(private val token: KToken) {
 		fun getUserChatView(chatCode: String): KResponse<KUserChatViewDefinition> {
 			return doGet(
 				"/api/v3/user-chat/view",
-				"chat_code" map chatCode
+				mapOf("chat_code" to chatCode)
 			).toJson().getTyped()
 		}
 
@@ -548,7 +547,7 @@ class KaiApi(private val token: KToken) {
 		fun postUserChatCreate(userId: String): KResponse<KUserChatViewDefinition> {
 			return doPost(
 				"/api/v3/user-chat/create",
-				("target_id" map userId).toJson()
+				mapOf("target_id" to userId).toJson()
 			).toJson().getTyped()
 		}
 
@@ -559,7 +558,7 @@ class KaiApi(private val token: KToken) {
 		fun postUserChatDelete(userId: String): KBasicResponse {
 			return doPost(
 				"/api/v3/user-chat/delete",
-				("target_id" map userId).toJson()
+				mapOf("target_id" to userId).toJson()
 			).toJson().getTyped()
 		}
 
@@ -625,7 +624,7 @@ class KaiApi(private val token: KToken) {
 		fun postDirectMessageDelete(msgId: String): KBasicResponse {
 			return doPost(
 				"/api/v3/direct-message/delete",
-				"msg_id" map msgId
+				mapOf("msg_id" to msgId)
 			).toJson().getTyped()
 		}
 
@@ -835,7 +834,7 @@ class KaiApi(private val token: KToken) {
 		fun getGuildEmojiList(guildId: String): KListResponse<KGuildEmojiDefinition> {
 			return doGet(
 				"/api/v3/guild-emoji/list",
-				"guild_id" map guildId
+				mapOf("guild_id" to guildId)
 			).toJson().getTyped()
 		}
 
@@ -899,19 +898,6 @@ class KaiApi(private val token: KToken) {
 
 private val gson = Gson()
 
-private fun Response.toJson(): KaiResponseData = JsonParser.parseReader(this.body?.charStream())
-	.asResponseData().apply { // 错误检查
-		if(!this.isJsonObject) {
-			throw IllegalStateException("Response must be JsonObject, but currently is ${this.javaClass.simpleName}")
-		}
-	}
-
-/**
- * 开黑啦Api返回回来的数据
- */
-typealias KaiResponseData = JsonObject
-typealias KaiResponseDataItems = JsonArray
-
 /**
  * 把传进来的 JsonElement 转为 JsonObject，用于无 data 的操作
  *
@@ -922,7 +908,7 @@ typealias KaiResponseDataItems = JsonArray
  * }
  *
  */
-private fun JsonElement.asResponseData(): KaiResponseData {
+private fun JsonElement.asResponseData(): KaiResponseJsonObject {
 	log.debug(this.toString())
 	if(this.isJsonObject) {
 		return this.asJsonObject
@@ -931,36 +917,21 @@ private fun JsonElement.asResponseData(): KaiResponseData {
 	}
 }
 
-@Deprecated("移除")
-private fun JsonElement.getData(): KaiResponseData {
-	if(this.isJsonObject && this.asJsonObject.has("data")) {
-		return this.asJsonObject.getAsJsonObject("data")
-	} else {
-		throw NoSuchElementException("data")
+private fun Response.toJson(): KaiResponseJsonObject = JsonParser.parseReader(this.body?.charStream())
+	.asResponseData().apply { // 错误检查
+		if(!this.isJsonObject) {
+			throw IllegalStateException("Response must be JsonObject, but currently is ${this.javaClass.simpleName}")
+		}
 	}
-}
 
-private fun JsonObject.getItems(): KaiResponseDataItems {
-	if(this.has("items")) {
-		return this.getAsJsonArray("items")
-	} else {
-		throw NoSuchElementException("items")
-	}
-}
+/**
+ * 开黑啦Api返回回来的数据
+ */
+typealias KaiResponseJsonObject = JsonObject
 
-private inline fun <reified T> KaiResponseData.getTyped(): T = gson.fromJson(this, (object : TypeToken<T>() {}.type))
-
-@Deprecated("-1")
-private inline fun <reified T> KaiResponseData.getTypedList(): T =
-	gson.fromJson(this.getItems(), (object : TypeToken<T>() {}.type))
-
-private infix fun <A, B> A.map(that: B): Map<A, B> = mapOf(this to that)
+private inline fun <reified T> KaiResponseJsonObject.getTyped(): T = gson.fromJson(this, (object : TypeToken<T>() {}.type))
 
 private fun <K, V> Map<K, V>.toJson(): String = gson.toJson(this)
-
-// Encode
-
-private fun Any.urlEncode() = URLEncoder.encode(this.toString(), Charsets.UTF_8)
 
 // Public
 
