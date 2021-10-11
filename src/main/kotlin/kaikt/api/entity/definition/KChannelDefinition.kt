@@ -23,5 +23,11 @@ data class KChannelDefinition(
 	@SerializedName("permission_sync")
 	val permissionSync: Int,
 	@SerializedName("permission_overwrites")
-	val permissionOverwrites: List<KPermissionOverwritesDefinition>
+	val permissionOverwrites: List<KPermissionOverwritesDefinition>,
+	@SerializedName("permission_users")
+	val permissionUsers: List<KPermissionUserDefinition>,
+	@SerializedName("voice_quality")
+	val voiceQuality: Int,
+	@SerializedName("server_url")
+	val serverUrl: String
 )

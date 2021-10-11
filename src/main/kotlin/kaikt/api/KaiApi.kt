@@ -9,6 +9,7 @@ import kaikt.api.entity.permission.KPermission
 import kaikt.api.entity.request.*
 import kaikt.api.entity.response.*
 import kaikt.api.util.valueNotNullMapOf
+import kaikt.websocket.hazelnut.toHUser
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -57,7 +58,7 @@ class KaiApi(private val token: KToken) {
 		val request = Request.Builder()
 			.get()
 			.url(url)
-			.addHeader("Authorization", token.toString())
+			.addHeader("Authorization", token.toFullToken())
 			.apply {
 				headers.forEach { (headerName, headerValue) ->
 					addHeader(headerName, headerValue)
@@ -91,7 +92,7 @@ class KaiApi(private val token: KToken) {
 		val request = Request.Builder()
 			.url(url)
 			.post(body)
-			.addHeader("Authorization", token.toString())
+			.addHeader("Authorization", token.toFullToken())
 			.apply {
 				headers.forEach { (headerName, headerValue) ->
 					addHeader(headerName, headerValue)
@@ -118,6 +119,16 @@ class KaiApi(private val token: KToken) {
 		headers: Map<String, String> = valueNotNullMapOf(),
 		noCompress: Boolean = true
 	) = doPost(endpoint, gson.toJson(body), headers, noCompress)
+
+	override fun toString(): String {
+		return "KaiApi(token=$token)"
+	}
+
+	val me
+		get() = User().getUserMe()
+
+	val meUser
+		get() = User().getUserMe().toHUser(this)
 
 	inner class Guild {
 
@@ -291,7 +302,7 @@ class KaiApi(private val token: KToken) {
 			val body = KChannelCreateRequest(guildId, name).apply(request).body
 			return doPost(
 				"/api/v3/channel/create",
-				body.apply { println(this) }
+				body
 			).toJson().getData().getTyped()
 		}
 
@@ -845,9 +856,7 @@ class KaiApi(private val token: KToken) {
 
 					addFormDataPart("guild_id", guildId)
 					addFormDataPart("emoji", name, emoji.asRequestBody())
-				}.build().apply {
-					println(this)
-				}
+				}.build()
 			).toJson().getData().getTyped()
 		}
 
@@ -892,7 +901,17 @@ class KaiApi(private val token: KToken) {
 
 private val gson = Gson()
 
-private fun Response.toJson(): KaiResponseData = JsonParser.parseReader(this.body?.charStream()).asResponseData()
+private fun Response.toJson(): KaiResponseData = JsonParser.parseReader(this.body?.charStream())
+	.asResponseData().apply { // 错误检查
+		if(!this.isJsonObject) {
+			throw IllegalStateException("Response must be JsonObject, but currently is ${this.javaClass.simpleName}")
+		} else {
+			val code = this.asJsonObject.getAsJsonPrimitive("code").asInt
+			if(code != 0) {
+				throw IllegalStateException("Error response with code of $code. $this")
+			}
+		}
+	}
 
 /**
  * 开黑啦Api返回回来的数据
@@ -937,7 +956,7 @@ private fun JsonObject.getItems(): KaiResponseDataItems {
 
 private inline fun <reified T> KaiResponseData.getTyped(): T = gson.fromJson(this, (object : TypeToken<T>() {}.type))
 private inline fun <reified T> KaiResponseData.getTypedList(): T =
-	gson.fromJson(this.getItems().also { println(it) }, (object : TypeToken<T>() {}.type))
+	gson.fromJson(this.getItems(), (object : TypeToken<T>() {}.type))
 
 private infix fun <A, B> A.map(that: B): Map<A, B> = mapOf(this to that)
 

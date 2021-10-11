@@ -38,44 +38,42 @@ data class KMessageDefinition(
 	val quote: KMessageReplyDefinition?,
 	@SerializedName("mention_info")
 	val mentionInfo: KMentionInfoDefinition
-) {
+)
 
-	fun Typed?.peekType(): String? {
-		return this?.asJsonObject?.getAsJsonPrimitive("type")?.asString
+fun Typed?.peekType(): String? {
+	return this?.asJsonObject?.getAsJsonPrimitive("type")?.asString
+}
+
+fun Embed.toBiliVideo(): EmbedBiliVideo {
+	if(peekType() == "bili-video") {
+		return gson.fromJson(this, EmbedBiliVideo::class.java)
+	} else {
+		throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to EmbedBiliVideo")
 	}
+}
 
-	fun Embed.toBiliVideo(): EmbedBiliVideo {
-		if(peekType() == "bili-video") {
-			return gson.fromJson(this, EmbedBiliVideo::class.java)
-		} else {
-			throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to EmbedBiliVideo")
-		}
+fun Attachment.toImageAttachment(): ImageAttachment {
+	if(peekType() == "image") {
+		return gson.fromJson(this, ImageAttachment::class.java)
+	} else {
+		throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to ImageAttachment")
 	}
+}
 
-	fun Attachment.toImageAttachment(): ImageAttachment {
-		if(peekType() == "image") {
-			return gson.fromJson(this, ImageAttachment::class.java)
-		} else {
-			throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to ImageAttachment")
-		}
+fun Attachment.toFileAttachment(): FileAttachment {
+	if(peekType() == "file") {
+		return gson.fromJson(this, FileAttachment::class.java)
+	} else {
+		throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to FileAttachment")
 	}
+}
 
-	fun Attachment.toFileAttachment(): FileAttachment {
-		if(peekType() == "file") {
-			return gson.fromJson(this, FileAttachment::class.java)
-		} else {
-			throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to FileAttachment")
-		}
+fun Attachment.toVideoAttachment(): VideoAttachment {
+	if(peekType() == "video") {
+		return gson.fromJson(this, VideoAttachment::class.java)
+	} else {
+		throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to VideoAttachment")
 	}
-
-	fun Attachment.toVideoAttachment(): VideoAttachment {
-		if(peekType() == "video") {
-			return gson.fromJson(this, VideoAttachment::class.java)
-		} else {
-			throw UnsupportedOperationException("${this.javaClass.simpleName} cannot cast to VideoAttachment")
-		}
-	}
-
 }
 
 data class ImageAttachment(
