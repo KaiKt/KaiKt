@@ -3,6 +3,7 @@ package kaikt.websocket
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kaikt.api.KaiApi
+import kaikt.websocket.KaiClientException.*
 import kaikt.websocket.packet.Packet
 import kaikt.websocket.packet.c2s.C2SPingPacket
 import kaikt.websocket.packet.s2c.*
@@ -13,7 +14,6 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.LoggerFactory
 import java.util.logging.Level
-import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
@@ -21,7 +21,7 @@ private val gson = Gson()
 private val logger = LoggerFactory.getLogger("KaiClient")
 
 @OptIn(ExperimentalTime::class, DelicateCoroutinesApi::class)
-open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().data.getURI()) {
+class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().data.getURI()) {
 
 	val packetBus: EventBus = EventBus.builder().logger(object : Logger {
 		override fun log(level: Level, message: String) = log(level, message, null)
@@ -49,10 +49,6 @@ open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway(
 	val eventBus: EventBus get() = packetHandler.bus
 
 	val me = api.meUser
-
-	fun start() {
-		connect()
-	}
 
 	override fun onOpen(handshakedata: ServerHandshake?) {
 		launchWelcomePacketCountDown()
@@ -135,12 +131,16 @@ open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway(
 	}
 
 	override fun onClose(code: Int, reason: String?, remote: Boolean) {
-		println("$code, $reason, $remote")
+		if(remote) {
+			logger.error("远程主机关闭了连接($code)：$reason")
+		} else {
+			logger.warn("本地主机关闭了连接（$code）：$reason")
+		}
 		packetHandler.resetSn()
 	}
 
 	override fun onError(ex: Exception?) {
-		println("$ex")
+		logger.error("Websocket 出现未知异常！", ex)
 	}
 
 	/**
@@ -152,11 +152,12 @@ open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway(
 		logger.debug("[C2S] $json")
 	}
 
-	open fun onWelcomeTimedOut() {
-		exitProcess(-1)
+	private fun onWelcomeTimedOut() {
+		logger.warn("未收到来自服务器的欢迎包（WelcomePacket）")
+		throw KaiClientException(Type.WelcomeTimedOut, "未收到来自服务器的欢迎包")
 	}
 
-	open fun onHeartbeatTimedOut() = GlobalScope.launch {
+	private fun onHeartbeatTimedOut() = GlobalScope.launch {
 		reconnecting = true
 
 		logger.info("开始重连")
@@ -168,6 +169,7 @@ open class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway(
 			delay(seconds(2))
 			if(reconnecting) {
 				logger.warn("重连失败！")
+				throw KaiClientException(Type.HeartbeatSkip, "重连失败")
 			}
 		}
 	}
