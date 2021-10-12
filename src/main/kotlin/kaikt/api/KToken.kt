@@ -13,7 +13,9 @@ class KToken(private val type: TokenType, private val token: String) {
 		}
 	}
 
-	override fun toString() = "$type $token"
+	override fun toString() = "$type ${token.substring(0, 3)}*****${token.substring(token.length-4)}"
+
+	fun toFullToken() = "$type $token"
 
 	fun toApi() = KaiApi(this)
 

@@ -29,11 +29,11 @@ class TestApi {
 	fun testGuildList() {
 		log.info("测试 guild/list")
 		api.Guild().getGuildList().let { guilds ->
-			guilds.forEach { component ->
+			guilds.data.items.forEach { component ->
 				println("服务器：$component")
 			}
 
-			val id = guilds.first().id
+			val id = guilds.data.items.first().id
 
 
 			println()
@@ -43,7 +43,7 @@ class TestApi {
 
 			println()
 			println("测试 guild/user-list")
-			api.Guild().getGuildUserList(id).items.forEach {
+			api.Guild().getGuildUserList(id).data.items.forEach {
 				println(it)
 			}
 		}
@@ -52,11 +52,9 @@ class TestApi {
 	@Test
 	fun testGuildNickname() {
 		val nickname = Random.nextUInt(0U..UInt.MAX_VALUE)
-		val guildId = "1848030750973248"
-		val userId = "286234688"
 
 		log.info(
-			"{}", api.Guild().postGuildNickname(guildId, userId, nickname.toString())
+			"{}", api.Guild().postGuildNickname(guildId, userIdTaskeren, nickname.toString())
 		)
 	}
 
@@ -102,7 +100,7 @@ class TestApi {
 
 	@Test
 	fun testChannelList() {
-		api.Channel().getChannelList(guildId).forEach {
+		api.Channel().getChannelList(guildId).data.items.forEach {
 			log.info("$it")
 		}
 	}
@@ -120,7 +118,7 @@ class TestApi {
 
 	@Test
 	fun testChannelDelete() {
-		val channel = api.Guild().getGuildView(guildId).channels.first { it.name == "测试新建频道" }
+		val channel = api.Guild().getGuildView(guildId).data.channels.first { it.name == "测试新建频道" }
 		log.info("识别到测试 Channel ${channel.name}(${channel.id})，执行删除")
 		log.info("${api.Channel().postChannelDelete(channel.id)}")
 	}
@@ -144,8 +142,9 @@ class TestApi {
 
 	@Test
 	fun testChannelRoleUpdate() {
-		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withUserId(userIdTaskeren), 0b1).asPermissionUser}")
-		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withRoleId("443180"), KPermissionBits.ManageChannel).asPermissionRole}")
+		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withUserId(userIdTaskeren), 0b1).data.asPermissionUser}")
+		val role = api.Guild().getGuildView(guildId).data.roles.first()
+		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withRoleId(role.roleId), KPermissionBits.ManageChannel).data.asPermissionRole}")
 	}
 
 	@Test
@@ -177,15 +176,15 @@ class TestApi {
 	@Test
 	fun testSendMessageAndUpdate() {
 		val firstMsg = api.Message().postMessageCreate("2164858811059799", "测试文本#1")
-		log.info("Message #1 ${firstMsg.msgId}")
-		api.Message().postMessageUpdate(firstMsg.msgId, "测试文本#2")
+		log.info("Message #1 ${firstMsg.data.msgId}")
+		api.Message().postMessageUpdate(firstMsg.data.msgId, "测试文本#2")
 	}
 
 	@Test
 	fun testSendMessageAndDelete() {
 		val firstMsg = api.Message().postMessageCreate("2164858811059799", "测试文本#1")
-		log.info("Message #1 ${firstMsg.msgId}")
-		api.Message().postMessageDelete(firstMsg.msgId)
+		log.info("Message #1 ${firstMsg.data.msgId}")
+		api.Message().postMessageDelete(firstMsg.data.msgId)
 	}
 
 	@Test
@@ -233,24 +232,21 @@ class TestApi {
 
 	@Test
 	fun testUserChatCreate() {
-		log.info("${api.UserChat().postUserChatCreate(userIdTaskeren)}")
-	}
-
-	@Test
-	fun testUserChatDelete() {
-		log.info("${api.UserChat().postUserChatDelete("7775969d3b084e6fb3a55a482c191bc6")}")
+		val create = api.UserChat().postUserChatCreate(userIdTaskeren)
+		log.info("$create")
+		log.info("${api.UserChat().postUserChatDelete(userIdTaskeren)}")
 	}
 
 	@Test
 	fun testGuildEmojiList() {
-		api.GuildEmoji().getGuildEmojiList(guildId).forEach {
+		api.GuildEmoji().getGuildEmojiList(guildId).data.items.forEach {
 			log.info("$it")
 		}
 	}
 
 	@Test
 	fun testDMList() {
-		api.DirectMessage().getDirectMessageList(TargetIdOrChatCode.withTargetId(userIdTaskeren)).forEach {
+		api.DirectMessage().getDirectMessageList(TargetIdOrChatCode.withTargetId(userIdTaskeren)).data.items.forEach {
 			log.info("$it")
 		}
 	}
@@ -265,57 +261,42 @@ class TestApi {
 	@Test
 	fun testDMUpdate() {
 		val firstDM = api.DirectMessage().postDirectMessageCreate(TargetIdOrChatCode.withTargetId(userIdTaskeren), "更新的消息 #0")
-		log.info("第一条消息：${firstDM.msgId}")
-		log.info("${api.DirectMessage().postDirectMessageUpdate(firstDM.msgId, "更新后的消息 #1")}")
+		log.info("第一条消息：${firstDM.data.msgId}")
+		log.info("${api.DirectMessage().postDirectMessageUpdate(firstDM.data.msgId, "更新后的消息 #1")}")
 	}
 
 	@Test
 	fun testDMDelete() {
 		val firstDM = api.DirectMessage().postDirectMessageCreate(TargetIdOrChatCode.withTargetId(userIdTaskeren), "要删除的消息")
-		log.info("第一条消息：${firstDM.msgId}")
-		log.info("${api.DirectMessage().postDirectMessageDelete(firstDM.msgId)}")
+		log.info("第一条消息：${firstDM.data.msgId}")
+		log.info("${api.DirectMessage().postDirectMessageDelete(firstDM.data.msgId)}")
 	}
 
 	@Test
 	fun testGetRoles() {
-		api.GuildRole().getGuildRoleList(guildId).forEach {
+		api.GuildRole().getGuildRoleList(guildId).data.items.forEach {
 			log.info("$it")
 		}
 	}
 
 	@Test
-	fun testCreateAndUpdateRole() {
+	fun testCreateAndUpdateRoleThenDelete() {
 		val role1 = api.GuildRole().postGuildRoleCreate(guildId, "测试身分组")
 		log.info("$role1")
 		log.info("${
-			api.GuildRole().postGuildRoleUpdate(guildId, role1.roleId) {
+			api.GuildRole().postGuildRoleUpdate(guildId, role1.data.roleId) {
 				name = "测试身分组改名了"
 			}
 		}")
+		log.info("${api.GuildRole().postGuildRoleDelete(guildId, role1.data.roleId)}")
 	}
 
 	@Test
-	fun testDeleteRole() {
-		val roleId = "442987"
-		log.info("${api.GuildRole().postGuildRoleDelete(guildId, roleId)}")
-	}
-
-	@Test
-	fun testRoleGrant() {
-		val role = api.GuildRole().getGuildRoleList(guildId).first { it.type == 0 && it.permissions != 1 }
+	fun testRoleGrantAndRevoke() {
+		val role = api.GuildRole().getGuildRoleList(guildId).data.items.first { it.type == 0 && it.permissions != 1 }
 		log.info("${api.GuildRole().postGuildRoleGrant(guildId, userIdTaskeren, role.roleId)}")
-	}
-
-	@Test
-	fun testRoleRevoke() {
-		val roles = api.User().getUserView(userIdTaskeren, guildId).roles.map { it.toString() }
-		val role = api.GuildRole().getGuildRoleList(guildId).first {
-			(it.type == 0) && (it.permissions != 1) && roles.contains(it.roleId)
-		}
 		log.info("${api.GuildRole().postGuildRoleRevoke(guildId, userIdTaskeren, role.roleId)}")
 	}
-
-	val emojiId = "1848030750973248/JV0lkpjlcU02d01s"
 
 	@Test
 	fun testGuildEmojiUpload() {
@@ -329,6 +310,7 @@ class TestApi {
 
 	@Test
 	fun testGuildEmojiUpdate() {
+		val emojiId = api.GuildEmoji().getGuildEmojiList(guildId).data.items.first().id
 		log.info("${api.GuildEmoji().postGuildEmojiUpdate(emojiId, "测试表情 ${Random.nextUInt()}")}")
 	}
 

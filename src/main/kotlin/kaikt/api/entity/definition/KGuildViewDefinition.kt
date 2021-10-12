@@ -14,10 +14,6 @@ data class KGuildViewDefinition(
 	@SerializedName("notify_type")
 	val notifyType: Int,
 	val region: String,
-	@SerializedName("enable_open")
-	val enableOpen: Boolean,
-	@SerializedName("open_id")
-	val openId: String,
 	@SerializedName("default_channel_id")
 	val defaultChannelId: String,
 	@SerializedName("welcome_channel_id")

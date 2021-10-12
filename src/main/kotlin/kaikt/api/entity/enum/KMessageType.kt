@@ -6,7 +6,7 @@ enum class KMessageType(val i: Int) {
 	Picture(2),
 	Video(3),
 	File(4),
-	KMarkdown(5),
+	KMarkdown(9),
 	CardMessage(10);
 
 	fun Int.enumMessageType(): KMessageType {
@@ -19,3 +19,5 @@ enum class KMessageType(val i: Int) {
 	}
 
 }
+
+fun Int.toMessageType() = KMessageType.values().firstOrNull { it.i == this }
