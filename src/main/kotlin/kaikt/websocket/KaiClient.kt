@@ -3,7 +3,6 @@ package kaikt.websocket
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kaikt.api.KaiApi
-import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.packet.Packet
 import kaikt.websocket.packet.c2s.C2SPingPacket
 import kaikt.websocket.packet.s2c.*
@@ -13,7 +12,6 @@ import org.greenrobot.eventbus.Logger
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.LoggerFactory
-import java.net.URI
 import java.util.logging.Level
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.seconds

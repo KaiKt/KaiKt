@@ -1,3 +1,5 @@
+@file:Suppress("SpellCheckingInspection")
+
 package kaikt
 
 import kaikt.api.KToken
@@ -227,7 +229,7 @@ class TestClient {
 		e.guild.channels.firstTextChannel().sendMessage("${e.userIds.first()} 被解除禁封了。")
 	}
 
-	val table = "fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF"
+	val table = ("fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF")
 	val tr = mutableMapOf<Char, Int>().apply {
 		for(i in 0 until 58) {
 			this[table[i]] = i

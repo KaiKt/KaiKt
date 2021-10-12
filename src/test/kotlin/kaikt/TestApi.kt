@@ -298,8 +298,6 @@ class TestApi {
 		log.info("${api.GuildRole().postGuildRoleRevoke(guildId, userIdTaskeren, role.roleId)}")
 	}
 
-	val emojiId = "1848030750973248/JV0lkpjlcU02d01s"
-
 	@Test
 	fun testGuildEmojiUpload() {
 		log.info(
@@ -312,6 +310,7 @@ class TestApi {
 
 	@Test
 	fun testGuildEmojiUpdate() {
+		val emojiId = api.GuildEmoji().getGuildEmojiList(guildId).data.items.first().id
 		log.info("${api.GuildEmoji().postGuildEmojiUpdate(emojiId, "测试表情 ${Random.nextUInt()}")}")
 	}
 

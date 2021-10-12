@@ -26,7 +26,7 @@ class PacketHandler(private val client: KaiClient) {
 	fun handle(packet: S2CEventPacket) {
 		if(packet.sn-1 == sn) {
 			sn += 1
-			logger.info("$packet") // TODO: 2021/10/7 记得删掉
+			logger.debug("$packet")
 
 			// 跳过自己的消息，但是其他的还是需要自行判断处理
 			if(packet.data.authorId == client.me.userId) {
@@ -171,8 +171,6 @@ class PacketHandler(private val client: KaiClient) {
 						val e = extra.asGuildBanBody!!
 						bus.post(GuildDeletedBlockListEvent(client, data.targetId, e.operatorId, e.userId))
 					}
-
-					// TODO: 2021/10/9 继续添加其他的东西 https://dev.taskeren.cn/project/KaiKt/overview
 				}
 			} else {
 				val extra = data.nonSystemExtra

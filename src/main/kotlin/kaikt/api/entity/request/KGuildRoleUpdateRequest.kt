@@ -34,7 +34,6 @@ class KGuildRoleUpdateRequest(val guildId: String, val roleId: String) {
 	fun setHoist(hoist: Boolean) = apply { this.hoist = if(hoist) "1" else "0" }
 	fun setMentionable(mentionable: Boolean) = apply { this.mentionable = if(mentionable) "1" else "0" }
 
-	// TODO: 这个有点不太明白，试试再说
 	fun setPermission(perm: Int) = apply { this.permissions = perm.toString() }
 	fun setPermission(perm: UInt) = setPermission(perm.toInt())
 	fun setPermission(perm: Long) = setPermission(perm.toUInt())

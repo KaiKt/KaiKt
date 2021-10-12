@@ -19,8 +19,6 @@ data class SystemExtra(
 		return if(type in allowTypes) gson.fromJson(this, (object : TypeToken<T>() {}.type)) else null
 	}
 
-	// TODO: 把BODY搞上
-
 	// 频道相关事件
 
 	// 添加/移除反应
