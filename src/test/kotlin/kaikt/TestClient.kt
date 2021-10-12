@@ -20,7 +20,7 @@ class TestClient {
 
 		cli.eventBus.register(this)
 
-		cli.start()
+		cli.connect()
 	}
 
 	@Subscribe
