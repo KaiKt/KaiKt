@@ -1,6 +1,6 @@
 package kaikt
 
-import kaikt.api.entity.permission.KPermissionBits
+import kaikt.api.entity.permission.*
 import org.junit.jupiter.api.Test
 
 class TestPerm {
@@ -8,13 +8,21 @@ class TestPerm {
 	@Test
 	fun testPerm() {
 
-		KPermissionBits::class.java.declaredFields.forEach {
-			println("${it.name} \t ${it.get(KPermissionBits)}")
-		}
+		val p = KPermission(0u)
 
-		println(
-			"Is Admin = ${KPermissionBits.Administrator.and(KPermissionBits.Administrator)}"
-		)
+		println(p)
+		p.grant(PermissionEnum.Administrator)
+		println(p)
+		p.grant(PermissionEnum.BlockUser)
+		println(p)
+
+		println(p.has(PermissionEnum.BlockUser)) // true
+		println(p.has(PermissionEnum.KickUser)) // true
+
+		p.revoke(PermissionEnum.Administrator)
+		println(p)
+
+		println(p.has(PermissionEnum.KickUser)) // false
 
 	}
 
