@@ -3,6 +3,7 @@ package kaikt.websocket.hazelnut.guild
 import kaikt.api.KaiApi
 import kaikt.api.entity.definition.KChannelDefinition
 import kaikt.api.entity.definition.KChannelViewDefinition
+import kaikt.api.entity.enum.KMessageType
 import kaikt.websocket.hazelnut.toHUser
 
 data class HChannel(
@@ -25,8 +26,11 @@ data class HChannel(
 
 	// TODO: 2021/10/7 应该有全移走的方法
 
-	fun sendMessage(content: String, quote: HGuildMessage? = null): HGuildMessage {
-		val create = api.Message().postMessageCreate(channelId, content) { this.quote = quote?.messageId }
+	fun sendMessage(content: String, type: KMessageType? = null, quote: HGuildMessage? = null): HGuildMessage {
+		val create = api.Message().postMessageCreate(channelId, content) {
+			this.type = type
+			this.quote = quote?.messageId
+		}
 		return HGuildMessage(api, 1, this, create.data.msgId, content, api.me.toHUser(api, guild))
 	}
 

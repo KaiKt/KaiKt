@@ -3,12 +3,15 @@
 package kaikt
 
 import kaikt.api.KToken
+import kaikt.api.entity.enum.KMessageType
+import kaikt.cardmsg.*
 import kaikt.websocket.KaiClient
 import kaikt.websocket.event.direct.*
 import kaikt.websocket.event.guild.*
 import kaikt.websocket.hazelnut.guild.firstTextChannel
 import org.apache.logging.log4j.LogManager
 import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.SubscriberExceptionEvent
 
 class TestClient {
 
@@ -26,12 +29,27 @@ class TestClient {
 	@Subscribe
 	fun guildTextMessage(event: GuildTextMessageEvent) {
 		log.info(event)
-		event.message.reply("哦哦，知道了")
+		// event.message.reply("哦哦，知道了")
 
 //		event.message.content?.startsWith("https://www.bilibili.com/video/").let {
 //			val bv = event.message.content?.substring("https://www.bilibili.com/video/".length)
 //			event.message.reply(AvBv.b2v(bv!!))
 //		}
+
+		val card = buildCardMessage {
+			header("测试卡片")
+			textAndButton("测试文本", "嗯", "danger")
+			// image("https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg")
+			textAndImage("这个是机炮", "https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg", "sm")
+		}
+
+		val card1 = "[{\"type\":\"card\",\"theme\":\"secondary\",\"size\":\"lg\",\"modules\":[{\"type\":\"header\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试卡片\"}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试文本\"},\"mode\":\"right\",\"accessory\":{\"type\":\"button\",\"theme\":\"danger\",\"text\":{\"type\":\"plain-text\",\"content\":\"嗯\"}}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"这个是机炮\"},\"mode\":\"right\",\"accessory\":{\"type\":\"image\",\"src\":\"https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg\",\"size\":\"sm\"}}]}]"
+
+		println(card)
+		println(card1)
+
+		event.channel.sendMessage(card, KMessageType.CardMessage)
+		event.channel.sendMessage(card1, KMessageType.CardMessage)
 	}
 
 	@Subscribe
@@ -227,6 +245,11 @@ class TestClient {
 	fun guildDeletedBlockList(e: GuildDeletedBlockListEvent) {
 		log.info(e)
 		e.guild.channels.firstTextChannel().sendMessage("${e.userIds.first()} 被解除禁封了。")
+	}
+
+	@Subscribe
+	fun onError(e: SubscriberExceptionEvent) {
+		log.error(e.throwable)
 	}
 
 	val table = ("fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF")
