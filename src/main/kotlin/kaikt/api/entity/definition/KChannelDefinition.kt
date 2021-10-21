@@ -1,6 +1,7 @@
 package kaikt.api.entity.definition
 
 import com.google.gson.annotations.SerializedName
+import kaikt.api.util.IntBool
 
 data class KChannelDefinition(
 	val id: String,
@@ -19,7 +20,7 @@ data class KChannelDefinition(
 	@SerializedName("limit_amount")
 	val limitAmount: Int,
 	@SerializedName("is_category")
-	val isCategory: Boolean,
+	val isCategory: IntBool,
 	@SerializedName("permission_sync")
 	val permissionSync: Int,
 	@SerializedName("permission_overwrites")

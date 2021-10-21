@@ -66,22 +66,13 @@ class PacketHandler(private val client: KaiClient) {
 						bus.post(GuildDeletedMessageEvent(client, data.targetId, e.channelId, e.msgId))
 					}
 
-					// TODO: 2021/10/10 开黑啦摆烂，改文档也不该错接口，那我也摆烂。
 					"added_channel" -> {
 						val e = extra.asChannelBody!!
-						kotlin.runCatching {
-							bus.post(GuildAddedChannelEvent(client, e.guildId, e))
-						}.onFailure {
-							throw RuntimeException("开黑啦摆烂，改文档也不该错接口，那我也摆烂。", it)
-						}
+						bus.post(GuildAddedChannelEvent(client, e.guildId, e))
 					}
 					"updated_channel" -> {
 						val e = extra.asChannelBody!!
-						kotlin.runCatching {
-							bus.post(GuildUpdatedChannelEvent(client, e.guildId, e))
-						}.onFailure {
-							throw RuntimeException("开黑啦摆烂，改文档也不该错接口，那我也摆烂。", it)
-						}
+						bus.post(GuildUpdatedChannelEvent(client, e.guildId, e))
 					}
 					"deleted_channel" -> {
 						val e = extra.asDeletedChannelBody!!

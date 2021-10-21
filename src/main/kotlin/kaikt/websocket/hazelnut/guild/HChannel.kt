@@ -4,6 +4,7 @@ import kaikt.api.KaiApi
 import kaikt.api.entity.definition.KChannelDefinition
 import kaikt.api.entity.definition.KChannelViewDefinition
 import kaikt.api.entity.enum.KMessageType
+import kaikt.api.util.toBoolean
 import kaikt.websocket.hazelnut.toHUser
 
 data class HChannel(
@@ -36,8 +37,8 @@ data class HChannel(
 
 }
 
-fun KChannelDefinition.toHChannel(api: KaiApi) = HChannel(api, HGuild(api, guildId), id, isCategory)
-fun KChannelDefinition.toHChannel(api: KaiApi, guild: HGuild) = HChannel(api, guild, id, isCategory)
+fun KChannelDefinition.toHChannel(api: KaiApi) = HChannel(api, HGuild(api, guildId), id, isCategory.toBoolean())
+fun KChannelDefinition.toHChannel(api: KaiApi, guild: HGuild) = HChannel(api, guild, id, isCategory.toBoolean())
 
 fun KChannelViewDefinition.toHChannel(api: KaiApi) = HChannel(api, HGuild(api, guildId), id, isCategory)
 fun KChannelViewDefinition.toHChannel(api: KaiApi, guild: HGuild) = HChannel(api, guild, id, isCategory)

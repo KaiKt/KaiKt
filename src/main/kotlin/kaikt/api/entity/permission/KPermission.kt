@@ -190,6 +190,10 @@ enum class PermissionEnum(val bit: Int) {
 		return 1U.shl(bit)
 	}
 
+	fun toInt(): Int {
+		return toUInt().toInt()
+	}
+
 }
 
 @Deprecated("使用 [PermissionEnum]。")
