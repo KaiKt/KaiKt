@@ -1,12 +1,13 @@
 package kaikt.websocket.packet.s2c.data
 
-import com.google.gson.Gson
-import com.google.gson.JsonObject
+import com.google.gson.*
 import com.google.gson.annotations.SerializedName
+import kaikt.api.util.IntBool
+import kaikt.api.util.IntBoolTypeAdapter
 import kaikt.websocket.packet.s2c.data.extra.NonSystemExtra
 import kaikt.websocket.packet.s2c.data.extra.SystemExtra
 
-internal val gson = Gson()
+internal val gson = GsonBuilder().registerTypeAdapter(IntBool::class.java, IntBoolTypeAdapter()).create()
 
 typealias EventPacketDataExtra = JsonObject
 

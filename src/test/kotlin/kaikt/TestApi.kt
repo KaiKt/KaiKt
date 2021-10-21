@@ -2,8 +2,9 @@ package kaikt
 
 import kaikt.api.KToken
 import kaikt.api.entity.enum.KGuildMuteType
-import kaikt.api.entity.permission.KPermissionBits
-import kaikt.api.entity.request.*
+import kaikt.api.entity.permission.PermissionEnum
+import kaikt.api.entity.request.RoleIdOrUserId
+import kaikt.api.entity.request.TargetIdOrChatCode
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -144,7 +145,7 @@ class TestApi {
 	fun testChannelRoleUpdate() {
 		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withUserId(userIdTaskeren), 0b1).data.asPermissionUser}")
 		val role = api.Guild().getGuildView(guildId).data.roles.first()
-		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withRoleId(role.roleId), KPermissionBits.ManageChannel).data.asPermissionRole}")
+		log.info("${api.Channel().postChannelRoleUpdate("5619366156155726", RoleIdOrUserId.withRoleId(role.roleId), PermissionEnum.ManageChannel.toInt()).data.asPermissionRole}")
 	}
 
 	@Test
