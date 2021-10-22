@@ -2,8 +2,6 @@ package kaikt.websocket.event.guild
 
 import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.KaiClient
-import kaikt.websocket.hazelnut.*
-import kaikt.websocket.hazelnut.guild.*
 
 data class GuildTextMessageEvent(
 	val client: KaiClient,
@@ -22,11 +20,13 @@ data class GuildTextMessageEvent(
 	val mentionRoles: List<String>,
 	val author: KUserDefinition
 ) {
-
-	val guild get() = HGuild(client.api, guildId)
-	val channel get() = HChannel(client.api, guild, channelId)
-
-	val sender get() = author.toHUser(client.api, guild)
-
-	val message get() = HGuildMessage(client.api, 1, channel, messageId, content, sender)
+	val guild by lazy { client.acorn.createAcornGuild(guildId) }
+	val channel by lazy { client.acorn.createAcornChannel(channelId) }
+	val sender by lazy { client.acorn.createAcornUser(authorId) }
+	val message by lazy { client.acorn.buildAcornMessage {
+		this.messageId = this@GuildTextMessageEvent.messageId
+		this.source = channel
+		this.messageContent = content
+		this.messageTimestamp = this@GuildTextMessageEvent.messageTimestamp
+	} }
 }

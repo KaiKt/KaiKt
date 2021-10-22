@@ -3,7 +3,10 @@ package kaikt.websocket
 import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kaikt.api.KaiApi
+import kaikt.gson
 import kaikt.websocket.KaiClientException.*
+import kaikt.websocket.acorn.AcornFactory
+import kaikt.websocket.acorn.v0.AcornFactoryImpl
 import kaikt.websocket.packet.Packet
 import kaikt.websocket.packet.c2s.C2SPingPacket
 import kaikt.websocket.packet.s2c.*
@@ -17,7 +20,6 @@ import java.util.logging.Level
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-private val gson = Gson()
 private val logger = LoggerFactory.getLogger("KaiClient")
 
 @OptIn(ExperimentalTime::class, DelicateCoroutinesApi::class)
@@ -48,7 +50,10 @@ class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().dat
 	val packetHandler = PacketHandler(this)
 	val eventBus: EventBus get() = packetHandler.bus
 
-	val me = api.meUser
+	// Acorn Powered
+	val acorn = AcornFactoryImpl(this)
+
+	val me = api.User().getUserMe().throwIfNotSuccess().data
 
 	override fun onOpen(handshakedata: ServerHandshake?) {
 		launchWelcomePacketCountDown()

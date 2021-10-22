@@ -2,7 +2,6 @@ package kaikt.websocket.event.guild
 
 import kaikt.api.entity.definition.KGuildDefinition
 import kaikt.websocket.KaiClient
-import kaikt.websocket.hazelnut.guild.HGuild
 
 data class GuildUpdatedGuildEvent(
 	val client: KaiClient,
@@ -11,6 +10,6 @@ data class GuildUpdatedGuildEvent(
 	val guildDefinition: KGuildDefinition
 ) {
 
-	val guild get() = HGuild(client.api, guildId)
+	val guild by lazy { client.acorn.createAcornGuild(guildId) }
 
 }

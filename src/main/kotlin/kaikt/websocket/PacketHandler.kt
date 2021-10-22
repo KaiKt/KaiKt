@@ -29,7 +29,7 @@ class PacketHandler(private val client: KaiClient) {
 			logger.debug("$packet")
 
 			// 跳过自己的消息，但是其他的还是需要自行判断处理
-			if(packet.data.authorId == client.me.userId) {
+			if(packet.data.authorId == client.me.id) {
 				return
 			}
 
@@ -44,19 +44,19 @@ class PacketHandler(private val client: KaiClient) {
 				when(extra.type) {
 					"added_reaction" -> {
 						val e = extra.asReactionBody!!
-						if(e.userId != client.me.userId) {
+						if(e.userId != client.me.id) {
 							bus.post(GuildAddedReactionEvent(client, e.channelId, e.emoji, e.userId, e.msgId))
 						}
 					}
 					"deleted_reaction" -> {
 						val e = extra.asReactionBody!!
-						if(e.userId != client.me.userId) {
+						if(e.userId != client.me.id) {
 							bus.post(GuildDeletedReactionEvent(client, e.channelId, e.emoji, e.userId, e.msgId))
 						}
 					}
 					"updated_message" -> { // TODO: 2021/10/7 没有判断是否是自己发送的办法
 						val e = extra.asUpdatedMessageBody!!
-						bus.post(GuildUpdatedMessageEvent(client, data.targetId, e.channelId, e.content, e.mention, e.mentionAll, e.mentionHere, e.mentionRoles, e.msgId))
+						bus.post(GuildUpdatedMessageEvent(client, data.targetId, e.channelId, e.content, e.mention, e.mentionAll, e.mentionHere, e.mentionRoles, e.msgId, e.updatedAt))
 					}
 
 					// 2021/10/9 后添加的内容
@@ -97,13 +97,13 @@ class PacketHandler(private val client: KaiClient) {
 					}
 					"private_added_reaction" -> {
 						val e = extra.asPrivateReactionBody!!
-						if(e.userId != client.me.userId) {
+						if(e.userId != client.me.id) {
 							bus.post(PrivateAddedReactionEvent(client, e.chatCode, e.emoji, e.userId, e.msgId))
 						}
 					}
 					"private_deleted_reaction" -> {
 						val e = extra.asPrivateReactionBody!!
-						if(e.userId != client.me.userId) {
+						if(e.userId != client.me.id) {
 							bus.post(PrivateDeletedReactionEvent(client, e.chatCode, e.emoji, e.userId, e.msgId))
 						}
 					}
@@ -119,7 +119,7 @@ class PacketHandler(private val client: KaiClient) {
 
 					"updated_guild_member" -> {
 						val e = extra.asUpdatedGuildMemberBody!!
-						if(e.userId != client.me.userId) {
+						if(e.userId != client.me.id) {
 							bus.post(GuildUserUpdatedEvent(client, data.targetId, e.userId, e.nickname))
 						}
 					}

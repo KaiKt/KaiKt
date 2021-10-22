@@ -9,7 +9,7 @@ import kaikt.api.entity.permission.KPermission
 import kaikt.api.entity.request.*
 import kaikt.api.entity.response.*
 import kaikt.api.util.valueNotNullMapOf
-import kaikt.websocket.hazelnut.toHUser
+import kaikt.gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -122,12 +122,6 @@ class KaiApi(private val token: KToken) {
 	override fun toString(): String {
 		return "KaiApi(token=$token)"
 	}
-
-	val me
-		get() = User().getUserMe().data
-
-	val meUser
-		get() = User().getUserMe().data.toHUser(this)
 
 	inner class Guild {
 
@@ -895,8 +889,6 @@ class KaiApi(private val token: KToken) {
 				by Taskeren-3
 
  */
-
-private val gson = Gson()
 
 /**
  * 把传进来的 JsonElement 转为 JsonObject，用于无 data 的操作

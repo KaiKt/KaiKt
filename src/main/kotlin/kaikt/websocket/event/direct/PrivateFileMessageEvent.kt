@@ -3,14 +3,11 @@ package kaikt.websocket.event.direct
 import kaikt.api.entity.definition.FileAttachment
 import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.KaiClient
-import kaikt.websocket.hazelnut.direct.HPrivateMessage
-import kaikt.websocket.hazelnut.direct.HUserChat
-import kaikt.websocket.hazelnut.toHUser
 
 data class PrivateFileMessageEvent(
 	val client: KaiClient,
 
-	val imageUrl: String,
+	val fileUrl: String,
 	val authorId: String,
 	val targetId: String,
 	val messageId: String,
@@ -20,10 +17,12 @@ data class PrivateFileMessageEvent(
 	val author: KUserDefinition,
 	val attachments: FileAttachment
 ) {
-
-	val sender get() = author.toHUser(client.api)
-
-	val chat get() = HUserChat(client.api, chatCode, client.api.meUser, sender)
-
-	val message get() = HPrivateMessage(client.api, 1, chat, messageId, imageUrl, sender)
+	val authorUser by lazy { client.acorn.createAcornUser(authorId) }
+	val targetUser by lazy { client.acorn.createAcornUser(targetId) }
+	val message by lazy { client.acorn.buildAcornMessage {
+		messageId = this@PrivateFileMessageEvent.messageId
+		source = authorUser
+		messageContent = this@PrivateFileMessageEvent.fileUrl
+		messageTimestamp = this@PrivateFileMessageEvent.messageTimestamp
+	} }
 }

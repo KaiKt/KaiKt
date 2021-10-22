@@ -8,7 +8,6 @@ import kaikt.cardmsg.*
 import kaikt.websocket.KaiClient
 import kaikt.websocket.event.direct.*
 import kaikt.websocket.event.guild.*
-import kaikt.websocket.hazelnut.guild.firstTextChannel
 import org.apache.logging.log4j.LogManager
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.SubscriberExceptionEvent
@@ -29,27 +28,26 @@ class TestClient {
 	@Subscribe
 	fun guildTextMessage(event: GuildTextMessageEvent) {
 		log.info(event)
-		// event.message.reply("哦哦，知道了")
+		event.message.reply("哦哦，知道了")
 
-//		event.message.content?.startsWith("https://www.bilibili.com/video/").let {
-//			val bv = event.message.content?.substring("https://www.bilibili.com/video/".length)
-//			event.message.reply(AvBv.b2v(bv!!))
+//		val card = buildCardMessage {
+//			header("测试卡片")
+//			textAndButton("测试文本", "嗯", "danger")
+//			// image("https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg")
+//			textAndImage("这个是机炮", "https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg", "sm")
 //		}
-
-		val card = buildCardMessage {
-			header("测试卡片")
-			textAndButton("测试文本", "嗯", "danger")
-			// image("https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg")
-			textAndImage("这个是机炮", "https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg", "sm")
-		}
-
-		val card1 = "[{\"type\":\"card\",\"theme\":\"secondary\",\"size\":\"lg\",\"modules\":[{\"type\":\"header\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试卡片\"}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试文本\"},\"mode\":\"right\",\"accessory\":{\"type\":\"button\",\"theme\":\"danger\",\"text\":{\"type\":\"plain-text\",\"content\":\"嗯\"}}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"这个是机炮\"},\"mode\":\"right\",\"accessory\":{\"type\":\"image\",\"src\":\"https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg\",\"size\":\"sm\"}}]}]"
-
-		println(card)
-		println(card1)
-
-		event.channel.sendMessage(card, KMessageType.CardMessage)
-		event.channel.sendMessage(card1, KMessageType.CardMessage)
+//
+//		val card1 = "[{\"type\":\"card\",\"theme\":\"secondary\",\"size\":\"lg\",\"modules\":[{\"type\":\"header\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试卡片\"}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"测试文本\"},\"mode\":\"right\",\"accessory\":{\"type\":\"button\",\"theme\":\"danger\",\"text\":{\"type\":\"plain-text\",\"content\":\"嗯\"}}},{\"type\":\"section\",\"text\":{\"type\":\"plain-text\",\"content\":\"这个是机炮\"},\"mode\":\"right\",\"accessory\":{\"type\":\"image\",\"src\":\"https://www.bungie.net/common/destiny2_content/icons/2828804450abc6575609258a3479b19a.jpg\",\"size\":\"sm\"}}]}]"
+//
+//		println(card)
+//		println(card1)
+//
+//		event.channel.sendMessage(card) {
+//			type = KMessageType.CardMessage
+//		}
+//		event.channel.sendMessage(card1) {
+//			type = KMessageType.CardMessage
+//		}
 	}
 
 	@Subscribe
@@ -57,7 +55,8 @@ class TestClient {
 		log.info(event)
 		event.message.reply("哦哦，好的好的")
 
-		event.sender.chat.sendMessage("你什么意思？").createReaction("[#129300;]")
+		event.authorUser.sendMessage("你什么意思？").addReaction("[#129300;]")
+		// event.sender.chat.sendMessage("你什么意思？").createReaction("[#129300;]")
 	}
 
 	@Subscribe
@@ -111,14 +110,14 @@ class TestClient {
 	@Subscribe
 	fun guildAddedReaction(event: GuildAddedReactionEvent) {
 		log.info(event)
-		event.message.reply("${event.userId == api.meUser.userId}")
-		event.message.createReaction(event.emoji.id)
+		// event.message.createReaction(event.emoji.id)
+		event.message.addReaction(event.emoji.id)
 	}
 
 	@Subscribe
 	fun guildDeletedMessage(event: GuildDeletedMessageEvent) {
 		log.info(event)
-		event.channel.sendMessage("Deleted Message: ${event.messageId}")
+		event.channel.sendMessage("被删除的讯息：${event.messageId}")
 	}
 
 	@Subscribe
@@ -136,7 +135,8 @@ class TestClient {
 	@Subscribe
 	fun guildDeletedChannel(event: GuildDeletedChannelEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("额，频道被删了欸！${event.channelId}")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("额，频道被删除了欸！${event.channelId}")
+		// event.guild.channels.first { it.isCategory != true }.sendMessage("额，频道被删了欸！${event.channelId}")
 	}
 
 	@Subscribe
@@ -160,91 +160,96 @@ class TestClient {
 	@Subscribe
 	fun privateDeleteMessage(event: PrivateDeletedMessageEvent) {
 		log.info(event)
-		event.chat.sendMessage(event.deletedMessage.messageId)
+		event.author.sendMessage("被删除的讯息：${event.messageId}")
+		// event.chat.sendMessage(event.deletedMessage.messageId)
 	}
 
 	@Subscribe
 	fun privateAddReaction(event: PrivateAddedReactionEvent) {
 		log.info(event)
-		event.message.createReaction(event.emoji.id)
+		event.message.addReaction(event.emoji.id)
+		// event.message.createReaction(event.emoji.id)
 	}
 
 	@Subscribe
 	fun privateDeleteReaction(event: PrivateDeletedReactionEvent) {
 		log.info(event)
-		event.message.deleteReaction(event.emoji.id)
+		event.message.delReaction(event.emoji.id)
+		// event.message.deleteReaction(event.emoji.id)
 	}
 
 	@Subscribe
 	fun guildUserJoined(event: GuildUserJoinedEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("欢迎 ${event.user.kView.data.nickname}")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("欢迎 ${event.user.getName()} 加入伺服器！")
+		// event.guild.channels.first { it.isCategory != true }.sendMessage("欢迎 ${event.user.kView.data.nickname}")
 	}
 
 	@Subscribe
 	fun guildUserExited(event: GuildUserExitedEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("再见 ${event.user.kView.data.username}")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("再见啦 ${event.user.getName()}！")
+		// event.guild.channels.first { it.isCategory != true }.sendMessage("再见 ${event.user.kView.data.username}")
 	}
 
 	@Subscribe
 	fun guildUserUpdated(event: GuildUserUpdatedEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("${event.nickname} 改名了！")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("${event.nickname} 改名了！")
 	}
 
 	@Subscribe
 	fun guildMemberOnline(event: GuildMemberOnlineEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("${event.user.nickname} 上线了！")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("${event.user.getNickname()} 上线了！")
 	}
 
 	@Subscribe
 	fun guildMemberOffline(event: GuildMemberOfflineEvent) {
 		log.info(event)
-		event.guild.channels.first { it.isCategory != true }.sendMessage("${event.user.nickname} 下线了！")
+		event.guild.getChannel { it.isTextChannel() }.sendMessage("${event.user.getNickname()} 下线了！")
 	}
 
 	@Subscribe
 	fun guildAddRole(e: GuildAddedRoleEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("Added ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("Added ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
 	}
 
 	@Subscribe
 	fun guildDeleteRole(e: GuildDeletedRoleEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("Deleted ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("Deleted ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
 	}
 
 	@Subscribe
 	fun guildUpdateRole(e: GuildUpdatedRoleEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("Updated ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("Updated ${e.roleDefinition.name} @ ${e.roleDefinition.color}")
 	}
 
 	@Subscribe
 	fun guildUpdateGuild(e: GuildUpdatedGuildEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("服务器更新了。")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("服务器更新了。")
 	}
 
 	@Subscribe
 	fun guildDeleteGuild(e: GuildDeletedGuildEvent) {
 		log.info(e)
-		e.guild.users.first().sendMessage("${e.guild.kView.name} 服务器删除了。")
+		e.guild.getUsers().first().sendMessage("${e.guild.getName()} 服务器删除了。")
 	}
 
 	@Subscribe
 	fun guildAddBlockList(e: GuildAddedBlockListEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("${e.userIds.first()} 因 ${e.remark} 被禁封了。")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("${e.userIds.first()} 因 ${e.remark} 被禁封了。")
 	}
 
 	@Subscribe
 	fun guildDeletedBlockList(e: GuildDeletedBlockListEvent) {
 		log.info(e)
-		e.guild.channels.firstTextChannel().sendMessage("${e.userIds.first()} 被解除禁封了。")
+		e.guild.getChannel { it.isTextChannel() }.sendMessage("${e.userIds.first()} 被解除禁封了。")
 	}
 
 	@Subscribe

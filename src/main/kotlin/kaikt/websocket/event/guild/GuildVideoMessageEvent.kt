@@ -2,14 +2,11 @@ package kaikt.websocket.event.guild
 
 import kaikt.api.entity.definition.*
 import kaikt.websocket.KaiClient
-import kaikt.websocket.event.*
-import kaikt.websocket.hazelnut.*
-import kaikt.websocket.hazelnut.guild.*
 
 data class GuildVideoMessageEvent(
 	val client: KaiClient,
 
-	val imageUrl: String,
+	val videoUrl: String,
 	val authorId: String,
 	val channelId: String,
 	val messageId: String,
@@ -24,11 +21,13 @@ data class GuildVideoMessageEvent(
 	val author: KUserDefinition,
 	val attachments: VideoAttachment
 ) {
-
-	val guild get() = HGuild(client.api, guildId)
-	val channel get() = HChannel(client.api, guild, channelId)
-
-	val sender get() = author.toHUser(client.api, guild)
-
-	val message get() = HGuildMessage(client.api, 2, channel, messageId, imageUrl, sender)
+	val guild by lazy { client.acorn.createAcornGuild(guildId) }
+	val channel by lazy { client.acorn.createAcornChannel(channelId) }
+	val sender by lazy { client.acorn.createAcornUser(authorId) }
+	val message by lazy { client.acorn.buildAcornMessage {
+		this.messageId = this@GuildVideoMessageEvent.messageId
+		this.source = sender
+		this.messageContent = videoUrl
+		this.messageTimestamp = this@GuildVideoMessageEvent.messageTimestamp
+	} }
 }

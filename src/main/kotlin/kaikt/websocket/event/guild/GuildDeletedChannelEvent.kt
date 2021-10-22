@@ -1,8 +1,6 @@
 package kaikt.websocket.event.guild
 
 import kaikt.websocket.KaiClient
-import kaikt.websocket.hazelnut.guild.HChannel
-import kaikt.websocket.hazelnut.guild.HGuild
 
 data class GuildDeletedChannelEvent(
 	val client: KaiClient,
@@ -10,9 +8,6 @@ data class GuildDeletedChannelEvent(
 	val guildId: String,
 	val channelId: String
 ) {
-
-	val guild get() = HGuild(client.api, guildId)
-
-	val channel get() = HChannel(client.api, guild, channelId)
-
+	val guild by lazy { client.acorn.createAcornGuild(guildId) }
+	val channel by lazy { client.acorn.createAcornChannel(channelId) }
 }

@@ -1,15 +1,13 @@
 package kaikt.websocket.event.guild
 
-import kaikt.api.entity.definition.*
+import kaikt.api.entity.definition.KMarkdownDefinition
+import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.KaiClient
-import kaikt.websocket.event.*
-import kaikt.websocket.hazelnut.guild.*
-import kaikt.websocket.hazelnut.toHUser
 
 data class GuildCardMessageEvent(
 	val client: KaiClient,
 
-	val imageUrl: String,
+	val content: String,
 	val authorId: String,
 	val channelId: String,
 	val messageId: String,
@@ -24,11 +22,13 @@ data class GuildCardMessageEvent(
 	val author: KUserDefinition,
 	val kMarkdown: KMarkdownDefinition
 ) {
-
-	val guild get() = HGuild(client.api, guildId)
-	val channel get() = HChannel(client.api, guild, channelId)
-
-	val sender get() = author.toHUser(client.api, guild)
-
-	val message get() = HGuildMessage(client.api, 2, channel, messageId, imageUrl, sender)
+	val guild by lazy { client.acorn.createAcornGuild(guildId) }
+	val channel by lazy { client.acorn.createAcornChannel(channelId) }
+	val sender by lazy { client.acorn.createAcornUser(authorId) }
+	val message by lazy { client.acorn.buildAcornMessage {
+		this.messageId = this@GuildCardMessageEvent.messageId
+		this.source = channel
+		this.messageContent = content
+		this.messageTimestamp = this@GuildCardMessageEvent.messageTimestamp
+	} }
 }
