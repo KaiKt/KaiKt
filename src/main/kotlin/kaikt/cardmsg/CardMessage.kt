@@ -2,7 +2,7 @@ package kaikt.cardmsg
 
 import com.google.gson.reflect.TypeToken
 import kaikt.cardmsg.entity.*
-import kaikt.websocket.packet.s2c.data.gson
+import kaikt.gson
 
 class CardMessage(
 	var theme: String = "secondary",
