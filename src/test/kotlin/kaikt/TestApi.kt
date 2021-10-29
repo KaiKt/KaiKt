@@ -11,10 +11,11 @@ import java.io.File
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
+val api = KToken(KToken.TokenType.Bot, "1/MTA0MjE=/zN5Lh9Na4wZPk0fpeTjDIg==").toApi()
+
 class TestApi {
 
 	private val log = LoggerFactory.getLogger("TestApi")
-	private val api = KToken(KToken.TokenType.Bot, "1/MTA0MjE=/zN5Lh9Na4wZPk0fpeTjDIg==").toApi()
 
 	private val guildId = "1848030750973248"
 	private val userIdTaskeren = "3865457829"
