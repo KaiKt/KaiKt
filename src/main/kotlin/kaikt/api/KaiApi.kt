@@ -710,7 +710,24 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	// TODO: 媒体模块接口
+	inner class Asset {
+
+		/**
+		 * 上传资源
+		 * @param file 资源文件
+		 */
+		fun postAssetCreate(file: File): KResponse<KAssetCreateData> {
+			return doPost(
+				"/api/v3/asset/create",
+				MultipartBody.Builder().apply {
+					setType(MultipartBody.FORM)
+
+					addFormDataPart("file", file.name, file.asRequestBody())
+				}.build()
+			).toJson().getTyped()
+		}
+
+	}
 
 	/**
 	 * 增删查改服务器身分组。
