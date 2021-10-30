@@ -8,6 +8,7 @@ import kaikt.api.entity.enum.KGuildMuteType
 import kaikt.api.entity.permission.KPermission
 import kaikt.api.entity.request.*
 import kaikt.api.entity.response.*
+import kaikt.api.util.uploadAsset
 import kaikt.api.util.valueNotNullMapOf
 import kaikt.gson
 import okhttp3.*
@@ -25,6 +26,14 @@ class KaiApi(private val token: KToken) {
 	private val cli = OkHttpClient.Builder().build()
 
 	private val mediaTypeJson = "application/json;charset=UTF-8".toMediaType()
+
+	companion object {
+		lateinit var unspecifiedInstance: KaiApi
+	}
+
+	init {
+		unspecifiedInstance = this
+	}
 
 	internal fun doGet(
 		endpoint: String,
@@ -725,6 +734,29 @@ class KaiApi(private val token: KToken) {
 					addFormDataPart("file", file.name, file.asRequestBody())
 				}.build()
 			).toJson().getTyped()
+		}
+
+		// 下面是辅助方法
+
+		/**
+		 * 将[src]下载到本地，再上传至开黑啦
+		 * @throws IllegalStateException 当下载或上传失败时抛出
+		 * @return 开黑啦资源链接
+		 * @see kaikt.api.util.FileDownloader
+		 */
+		fun uploadExternal(src: String): String {
+			return if(!isKaiAsset(src)) {
+				uploadAsset(src, this)
+			} else {
+				src
+			}
+		}
+
+		/**
+		 * [url]是否是开黑啦的资源
+		 */
+		fun isKaiAsset(url: String): Boolean {
+			return url.startsWith("https://img.kaiheila.cn")
 		}
 
 	}

@@ -1,11 +1,9 @@
 package kaikt.websocket
 
-import com.google.gson.Gson
 import com.google.gson.JsonParser
 import kaikt.api.KaiApi
 import kaikt.gson
 import kaikt.websocket.KaiClientException.*
-import kaikt.websocket.acorn.AcornFactory
 import kaikt.websocket.acorn.v0.AcornFactoryImpl
 import kaikt.websocket.packet.Packet
 import kaikt.websocket.packet.c2s.C2SPingPacket
