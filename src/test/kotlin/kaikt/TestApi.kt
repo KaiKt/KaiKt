@@ -3,11 +3,13 @@ package kaikt
 import kaikt.api.KToken
 import kaikt.api.entity.enum.KGuildMuteType
 import kaikt.api.entity.permission.PermissionEnum
-import kaikt.api.entity.request.RoleIdOrUserId
-import kaikt.api.entity.request.TargetIdOrChatCode
+import kaikt.api.entity.request.*
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
+import java.awt.BorderLayout
 import java.io.File
+import javax.imageio.ImageIO
+import javax.swing.*
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
@@ -19,6 +21,7 @@ class TestApi {
 
 	private val guildId = "1848030750973248"
 	private val userIdTaskeren = "3865457829"
+	private val userIdTaskeren4 = "2273502529"
 
 	@Test
 	fun testGateway() {
@@ -320,4 +323,41 @@ class TestApi {
 	fun testGuildEmojiDelete() {
 		log.info("${api.GuildEmoji().postGuildEmojiDelete("1848030750973248/Etu1I1WMIl02d01s")}")
 	}
+
+	@Test
+	fun testBlacklist() {
+		api.Blacklist().getBlacklist(guildId).data.items.forEach {
+			log.info("${it.user.nickname} has banned for ${it.createdTime}ms because ${it.remark}")
+		}
+
+		log.info("${api.Blacklist().postBlacklistCreate(guildId, userIdTaskeren4, "No reason!")}")
+
+		api.Blacklist().getBlacklist(guildId).data.items.forEach {
+			log.info("${it.user.nickname} has banned for ${it.createdTime}ms because ${it.remark}")
+		}
+
+		log.info("${api.Blacklist().postBlacklistDelete(guildId, userIdTaskeren4)}")
+	}
+
+	@Test
+	fun testInvite() {
+		log.info("${api.Invite().getInviteList(GuildOrChannel.withGuildId(guildId))}")
+
+		val a = api.Invite().postInviteCreate(GuildOrChannel.withGuildId(guildId), InviteDuration.A_DAY, InviteUsageCounter.ONCE)
+		log.info("$a")
+
+		log.info("${api.Invite().getInviteList(GuildOrChannel.withGuildId(guildId))}")
+
+		log.info("${
+			api.Invite().postInviteDelete(a.data.getUrlCode().apply { println(this) }, GuildOrChannel.withGuildId(guildId))
+		}")
+	}
+
+	@Test
+	fun testBadge() {
+		log.info("${
+			api.Badge().getBadge(guildId).body?.string()
+		}")
+	}
+
 }
