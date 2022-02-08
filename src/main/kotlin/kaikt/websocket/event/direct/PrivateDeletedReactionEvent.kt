@@ -11,7 +11,4 @@ data class PrivateDeletedReactionEvent(
 	val emoji: KEmojiDefinition,
 	val userId: String,
 	val messageId: String
-) {
-	val sender by lazy { client.acorn.createAcornUser(userId) }
-	val message by lazy { client.acorn.createAcornMessage(messageId, sender) }
-}
+)

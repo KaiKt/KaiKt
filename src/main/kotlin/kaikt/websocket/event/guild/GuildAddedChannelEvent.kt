@@ -8,10 +8,4 @@ data class GuildAddedChannelEvent(
 
 	val guildId: String,
 	val channelDefinition: KChannelDefinition
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val channel by lazy { client.acorn.buildAcornChannel {
-		this.channelId = channelDefinition.id
-		this.guildId = this@GuildAddedChannelEvent.guildId
-	} }
-}
+)

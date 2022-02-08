@@ -9,7 +9,4 @@ data class GuildMemberOfflineEvent(
 	val userId: String,
 	val offlineAt: Long,
 	val guildIds: List<String>
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val user by lazy { client.acorn.createAcornUser(userId) }
-}
+)

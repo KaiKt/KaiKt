@@ -16,13 +16,4 @@ data class PrivateKMarkdownMessageEvent(
 	val chatCode: String,
 	val author: KUserDefinition,
 	val kMarkdown: KMarkdownDefinition
-) {
-	val authorUser by lazy { client.acorn.createAcornUser(authorId) }
-	val targetUser by lazy { client.acorn.createAcornUser(targetId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		messageId = this@PrivateKMarkdownMessageEvent.messageId
-		source = authorUser
-		messageContent = this@PrivateKMarkdownMessageEvent.content
-		messageTimestamp = this@PrivateKMarkdownMessageEvent.messageTimestamp
-	} }
-}
+)

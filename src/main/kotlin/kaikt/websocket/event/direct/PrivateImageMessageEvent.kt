@@ -16,13 +16,4 @@ data class PrivateImageMessageEvent(
 	val chatCode: String,
 	val author: KUserDefinition,
 	val attachments: ImageAttachment
-) {
-	val authorUser by lazy { client.acorn.createAcornUser(authorId) }
-	val targetUser by lazy { client.acorn.createAcornUser(targetId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		messageId = this@PrivateImageMessageEvent.messageId
-		source = authorUser
-		messageContent = this@PrivateImageMessageEvent.imageUrl
-		messageTimestamp = this@PrivateImageMessageEvent.messageTimestamp
-	} }
-}
+)

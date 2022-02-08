@@ -21,14 +21,4 @@ data class GuildImageMessageEvent(
 	val mentionRoles: List<String>,
 	val author: KUserDefinition,
 	val attachments: ImageAttachment
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-	val sender by lazy { client.acorn.createAcornUser(authorId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		this.messageId = this@GuildImageMessageEvent.messageId
-		this.source = channel
-		this.messageContent = imageUrl
-		this.messageTimestamp = this@GuildImageMessageEvent.messageTimestamp
-	} }
-}
+)

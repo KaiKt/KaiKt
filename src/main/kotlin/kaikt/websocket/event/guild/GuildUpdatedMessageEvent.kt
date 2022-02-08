@@ -14,17 +14,4 @@ data class GuildUpdatedMessageEvent(
 	val mentionRoles: List<String>,
 	val messageId: String,
 	val updatedAt: Long
-) {
-
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-
-	val updatedMessage by lazy { client.acorn.buildAcornMessage {
-		this.messageId = this@GuildUpdatedMessageEvent.messageId
-		this.source = channel
-		this.messageContent = updatedContent
-		this.messageTimestamp = updatedAt
-	} }
-
-}
+)

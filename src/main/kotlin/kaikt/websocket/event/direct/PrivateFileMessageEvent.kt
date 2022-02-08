@@ -16,13 +16,4 @@ data class PrivateFileMessageEvent(
 	val chatCode: String,
 	val author: KUserDefinition,
 	val attachments: FileAttachment
-) {
-	val authorUser by lazy { client.acorn.createAcornUser(authorId) }
-	val targetUser by lazy { client.acorn.createAcornUser(targetId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		messageId = this@PrivateFileMessageEvent.messageId
-		source = authorUser
-		messageContent = this@PrivateFileMessageEvent.fileUrl
-		messageTimestamp = this@PrivateFileMessageEvent.messageTimestamp
-	} }
-}
+)

@@ -8,6 +8,4 @@ data class GuildDeletedGuildEvent(
 
 	val guildId: String,
 	val guildDefinition: KGuildDefinition
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-}
+)

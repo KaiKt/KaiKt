@@ -9,6 +9,4 @@ data class PrivateDeletedMessageEvent(
 	val messageId: String,
 	val deletedTimestamp: Long,
 	val chatCode: String
-) {
-	val author by lazy { client.acorn.createAcornUser(authorId) }
-}
+)

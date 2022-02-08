@@ -8,7 +8,4 @@ data class GuildUserUpdatedEvent(
 	val guildId: String,
 	val userId: String,
 	val nickname: String
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val user by lazy { client.acorn.createAcornUser(userId) }
-}
+)

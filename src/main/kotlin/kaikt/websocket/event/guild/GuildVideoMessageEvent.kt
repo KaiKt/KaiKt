@@ -20,14 +20,4 @@ data class GuildVideoMessageEvent(
 	val mentionRoles: List<String>,
 	val author: KUserDefinition,
 	val attachments: VideoAttachment
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-	val sender by lazy { client.acorn.createAcornUser(authorId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		this.messageId = this@GuildVideoMessageEvent.messageId
-		this.source = sender
-		this.messageContent = videoUrl
-		this.messageTimestamp = this@GuildVideoMessageEvent.messageTimestamp
-	} }
-}
+)

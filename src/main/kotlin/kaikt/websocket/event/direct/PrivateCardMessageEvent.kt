@@ -16,8 +16,4 @@ data class PrivateCardMessageEvent(
 	val chatCode: String,
 	val author: KUserDefinition,
 	val kMarkdown: KMarkdownDefinition
-) {
-	val authorUser by lazy { client.acorn.createAcornUser(authorId) }
-	val targetUser by lazy { client.acorn.createAcornUser(targetId) }
-	val message by lazy { client.acorn.createAcornMessage(messageId, authorUser) }
-}
+)

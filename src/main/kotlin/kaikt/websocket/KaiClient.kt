@@ -4,7 +4,6 @@ import com.google.gson.JsonParser
 import kaikt.api.KaiApi
 import kaikt.gson
 import kaikt.websocket.KaiClientException.*
-import kaikt.websocket.acorn.v0.AcornFactoryImpl
 import kaikt.websocket.packet.Packet
 import kaikt.websocket.packet.c2s.C2SPingPacket
 import kaikt.websocket.packet.s2c.*
@@ -47,9 +46,6 @@ class KaiClient(val api: KaiApi): WebSocketClient(api.Gateway().getGateway().dat
 
 	val packetHandler = PacketHandler(this)
 	val eventBus: EventBus get() = packetHandler.bus
-
-	// Acorn Powered
-	val acorn = AcornFactoryImpl(this)
 
 	val me = api.User().getUserMe().throwIfNotSuccess().data
 

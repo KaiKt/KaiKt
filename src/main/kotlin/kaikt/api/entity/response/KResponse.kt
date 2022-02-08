@@ -6,6 +6,7 @@ data class KResponse<T>(val code: Int, val message: String, val data: T) {
 
 	fun isSuccess() = code == 0
 
+	@Throws(IllegalStateException::class)
 	fun throwIfNotSuccess() = apply {
 		if(!isSuccess()) {
 			throw IllegalStateException("Unsuccessful API Request: $message($code) $data")

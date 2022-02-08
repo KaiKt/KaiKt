@@ -19,14 +19,4 @@ data class GuildTextMessageEvent(
 	val mentionHere: Boolean,
 	val mentionRoles: List<String>,
 	val author: KUserDefinition
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-	val sender by lazy { client.acorn.createAcornUser(authorId) }
-	val message by lazy { client.acorn.buildAcornMessage {
-		this.messageId = this@GuildTextMessageEvent.messageId
-		this.source = channel
-		this.messageContent = content
-		this.messageTimestamp = this@GuildTextMessageEvent.messageTimestamp
-	} }
-}
+)

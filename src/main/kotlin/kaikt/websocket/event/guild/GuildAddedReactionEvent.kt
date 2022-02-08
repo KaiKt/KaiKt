@@ -11,8 +11,4 @@ data class GuildAddedReactionEvent(
 	val emoji: KEmojiDefinition,
 	val userId: String,
 	val messageId: String
-) {
-	val sender by lazy { client.acorn.createAcornUser(userId) }
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-	val message by lazy { client.acorn.createAcornMessage(messageId, channel) }
-}
+)

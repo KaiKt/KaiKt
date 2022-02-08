@@ -7,7 +7,4 @@ data class GuildDeletedChannelEvent(
 
 	val guildId: String,
 	val channelId: String
-) {
-	val guild by lazy { client.acorn.createAcornGuild(guildId) }
-	val channel by lazy { client.acorn.createAcornChannel(channelId) }
-}
+)
