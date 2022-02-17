@@ -14,7 +14,7 @@ class YetiBot(config: YetiBotConfig) {
 
 	constructor(configureBlock: YetiBotConfig.Builder.() -> Unit) : this(YetiBotConfig.Builder().apply(configureBlock).build())
 
-	private val logger = LoggerFactory.getLogger("Yeti")
+	private val logger = LoggerFactory.getLogger(config.loggerName)
 
 	val kApi: KaiApi
 	val kCli: KaiClient

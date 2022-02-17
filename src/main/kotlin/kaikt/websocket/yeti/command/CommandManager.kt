@@ -15,4 +15,10 @@ class CommandManager(private val bot: YetiBot) {
 		bot.kCli.eventBus.unregister(this.listener)
 	}
 
+	fun enableListener(executor: (YetiBot, MessageContext) -> Unit) =
+		enableListener(object : YetiCommandListener(bot) {
+			override fun execute(context: MessageContext) {
+				executor(bot, context)
+			}
+		})
 }
