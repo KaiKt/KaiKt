@@ -3,6 +3,7 @@ package kaikt.websocket.event.direct
 import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.KaiClient
 
+@Deprecated("开黑啦已经移除 Text 消息，并全部转为 KMarkdown 消息", replaceWith = ReplaceWith("PrivateKMarkdownMessageEvent"))
 data class PrivateTextMessageEvent(
 	val client: KaiClient,
 
