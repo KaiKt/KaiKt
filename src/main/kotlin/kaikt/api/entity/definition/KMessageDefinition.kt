@@ -1,11 +1,8 @@
 package kaikt.api.entity.definition
 
-import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
-import java.awt.Image
-
-private val gson = Gson()
+import kaikt.gson
 
 typealias Typed = JsonElement
 

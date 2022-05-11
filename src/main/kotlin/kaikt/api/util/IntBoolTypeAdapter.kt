@@ -18,6 +18,9 @@ class IntBoolTypeAdapter : TypeAdapter<IntBool>() {
 		else if(peek == JsonToken.NUMBER) {
 			return reader.nextInt().toIntBool()
 		}
+		else if(peek == JsonToken.BOOLEAN) {
+			return reader.nextBoolean().toIntBool()
+		}
 		return reader.nextString().toIntBool()
 	}
 }

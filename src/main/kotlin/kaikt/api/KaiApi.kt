@@ -8,8 +8,9 @@ import kaikt.api.entity.enum.KGuildMuteType
 import kaikt.api.entity.permission.KPermission
 import kaikt.api.entity.request.*
 import kaikt.api.entity.response.*
+import kaikt.api.util.uploadAsset
 import kaikt.api.util.valueNotNullMapOf
-import kaikt.websocket.hazelnut.toHUser
+import kaikt.gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -25,6 +26,14 @@ class KaiApi(private val token: KToken) {
 	private val cli = OkHttpClient.Builder().build()
 
 	private val mediaTypeJson = "application/json;charset=UTF-8".toMediaType()
+
+	companion object {
+		lateinit var unspecifiedInstance: KaiApi
+	}
+
+	init {
+		unspecifiedInstance = this
+	}
 
 	internal fun doGet(
 		endpoint: String,
@@ -122,12 +131,6 @@ class KaiApi(private val token: KToken) {
 	override fun toString(): String {
 		return "KaiApi(token=$token)"
 	}
-
-	val me
-		get() = User().getUserMe().data
-
-	val meUser
-		get() = User().getUserMe().data.toHUser(this)
 
 	inner class Guild {
 
@@ -733,6 +736,29 @@ class KaiApi(private val token: KToken) {
 			).toJson().getTyped()
 		}
 
+		// 下面是辅助方法
+
+		/**
+		 * 将[src]下载到本地，再上传至开黑啦
+		 * @throws IllegalStateException 当下载或上传失败时抛出
+		 * @return 开黑啦资源链接
+		 * @see kaikt.api.util.FileDownloader
+		 */
+		fun uploadExternal(src: String): String {
+			return if(!isKaiAsset(src)) {
+				uploadAsset(src, this)
+			} else {
+				src
+			}
+		}
+
+		/**
+		 * [url]是否是开黑啦的资源
+		 */
+		fun isKaiAsset(url: String): Boolean {
+			return url.startsWith("https://img.kaiheila.cn")
+		}
+
 	}
 
 	/**
@@ -904,6 +930,130 @@ class KaiApi(private val token: KToken) {
 
 	}
 
+	inner class Invite {
+
+		/**
+		 * 获取邀请列表
+		 * @param guildOrChannel 服务器或频道
+		 */
+		fun getInviteList(guildOrChannel: GuildOrChannel, page: Int? = null, pageSize: Int? = null): KListResponse<KInviteData> {
+			return doGet(
+				"/api/v3/invite/list",
+				valueNotNullMapOf(
+					guildOrChannel.type to guildOrChannel.value,
+					"page" to page,
+					"page_size" to pageSize
+				)
+			).toJson().getTyped()
+		}
+
+		/**
+		 * 创建邀请链接
+		 * @param guildOrChannel 服务器或频道
+		 * @param expireTime 过期时间（秒）
+		 * @param expireUsageCounter 过期次数
+		 */
+		fun postInviteCreate(
+			guildOrChannel: GuildOrChannel,
+			expireTime: InviteDuration? = null,
+			expireUsageCounter: InviteUsageCounter? = null
+		): KResponse<KInviteCreateData> {
+			return doPost(
+				"/api/v3/invite/create",
+				valueNotNullMapOf(
+					guildOrChannel.type to guildOrChannel.value,
+					"duration" to expireTime?.value,
+					"setting_times" to expireUsageCounter?.value
+				)
+			).toJson().getTyped()
+		}
+
+		/**
+		 * 删除邀请链接
+		 * @param urlCode 邀请码（例如：https://kaihei.co/A1B2C3 中的 A1B2C3）
+		 * @param guildOrChannel 服务器或频道
+		 */
+		fun postInviteDelete(urlCode: String, guildOrChannel: GuildOrChannel): KBasicResponse {
+			return doPost(
+				"/api/v3/invite/delete",
+				valueNotNullMapOf(
+					"url_code" to urlCode,
+					guildOrChannel.type to guildOrChannel.value
+				)
+			).toJson().getTyped()
+		}
+	}
+
+	inner class Blacklist {
+
+		/**
+		 * 获取服务器黑名单列表
+		 * @param guildId 服务器ID
+		 */
+		fun getBlacklist(guildId: String): KListResponse<KBlacklistData> {
+			return doGet(
+				"/api/v3/blacklist/list",
+				valueNotNullMapOf(
+					"guild_id" to guildId
+				)
+			).toJson().getTyped()
+		}
+
+		/**
+		 * 加入黑名单
+		 * @param guildId 服务器ID
+		 * @param targetId 目标用户ID
+		 * @param remark 加入黑名单原因
+		 * @param delMessageDays 删除最近几天的消息（最大7天，默认为0）
+		 */
+		fun postBlacklistCreate(guildId: String, targetId: String, remark: String? = null, delMessageDays: Int? = null): KBasicResponse {
+			return doPost(
+				"/api/v3/blacklist/create",
+				valueNotNullMapOf(
+					"guild_id" to guildId,
+					"target_id" to targetId,
+					"remark" to remark,
+					"del_msg_days" to delMessageDays
+				)
+			).toJson().getTyped()
+		}
+
+		/**
+		 * 移除黑名单
+		 * @param guildId 服务器ID
+		 * @param targetId 目标用户ID
+		 */
+		fun postBlacklistDelete(guildId: String, targetId: String): KBasicResponse {
+			return doPost(
+				"/api/v3/blacklist/delete",
+				mapOf(
+					"guild_id" to guildId,
+					"target_id" to targetId
+				)
+			).toJson().getTyped()
+		}
+	}
+
+	inner class Badge {
+
+		/**
+		 * 获取服务器 Badge
+		 * @param guildId 服务器ID
+		 * @param style Badge 样式
+		 * @return svg标签字符串
+		 */
+		fun getBadge(guildId: String, style: BadgeStyle? = null): Response {
+			return doGet(
+				"/api/v3/badge/guild",
+				valueNotNullMapOf(
+					"guild_id" to guildId,
+					"style" to style?.value
+				)
+			)
+		}
+
+	}
+
 }
 
 /*
@@ -912,8 +1062,6 @@ class KaiApi(private val token: KToken) {
 				by Taskeren-3
 
  */
-
-private val gson = Gson()
 
 /**
  * 把传进来的 JsonElement 转为 JsonObject，用于无 data 的操作

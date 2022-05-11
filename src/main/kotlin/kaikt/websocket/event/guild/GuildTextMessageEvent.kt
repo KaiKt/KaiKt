@@ -2,8 +2,6 @@ package kaikt.websocket.event.guild
 
 import kaikt.api.entity.definition.KUserDefinition
 import kaikt.websocket.KaiClient
-import kaikt.websocket.hazelnut.*
-import kaikt.websocket.hazelnut.guild.*
 
 @Deprecated("开黑啦已经移除 Text 消息，并全部转为 KMarkdown 消息", replaceWith = ReplaceWith("GuildKMarkdownMessageEvent"))
 data class GuildTextMessageEvent(
@@ -22,12 +20,4 @@ data class GuildTextMessageEvent(
 	val mentionHere: Boolean,
 	val mentionRoles: List<String>,
 	val author: KUserDefinition
-) {
-
-	val guild get() = HGuild(client.api, guildId)
-	val channel get() = HChannel(client.api, guild, channelId)
-
-	val sender get() = author.toHUser(client.api, guild)
-
-	val message get() = HGuildMessage(client.api, 1, channel, messageId, content, sender)
-}
+)

@@ -3,8 +3,8 @@ package kaikt.websocket.packet.s2c.data.extra
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import kaikt.api.entity.definition.*
+import kaikt.gson
 import kaikt.websocket.packet.s2c.data.extra.body.*
-import kaikt.websocket.packet.s2c.data.gson
 
 typealias SystemExtraBody = JsonObject
 

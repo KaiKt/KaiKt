@@ -1,5 +1,5 @@
 package kaikt.cardmsg
 
-import kaikt.cardmsg.entity.ElementImage
+import kaikt.cardmsg.entity.ImageElement
 
-class ImageGroupComponent(val elements: MutableList<ElementImage> = mutableListOf()): CardComponent("image-group")
+class ImageGroupComponent(val elements: MutableList<ImageElement> = mutableListOf()): CardComponent("image-group")

@@ -1,8 +1,9 @@
 package kaikt.cardmsg
 
 import com.google.gson.reflect.TypeToken
+import kaikt.api.KaiApi
 import kaikt.cardmsg.entity.*
-import kaikt.websocket.packet.s2c.data.gson
+import kaikt.gson
 
 class CardMessage(
 	var theme: String = "secondary",
@@ -44,7 +45,7 @@ fun CardMessage.textAndImage(content: String, imageSrc: String, size: String = "
 fun CardMessage.textAndButton(content: String, btnContent: String, theme: String = "primary") =
 	addComponent(SectionComponentTextAndAccessory(TextPlainText(content), SectionAccessoryButton(theme, btnContent)))
 fun CardMessage.image(imageSrc: String) =
-	addComponent(ContainerComponent(ElementImage(imageSrc)))
+	addComponent(ContainerComponent(ImageElement(imageSrc)))
 fun CardMessage.imageGroup(block: ImageGroupComponent.() -> Unit) =
 	addComponent(ImageGroupComponent().apply(block))
 fun CardMessage.header(content: String) =
@@ -75,7 +76,7 @@ fun TextParagraph.text(content: String) = addContent(TextPlainText(content))
 fun TextParagraph.kMarkdown(content: String) = addContent(TextKMarkdown(content))
 
 fun ImageGroupComponent.image(imageSrc: String) =
-	apply { elements += ElementImage(imageSrc) }
+	apply { elements += ImageElement(imageSrc) }
 
 fun ActionGroupComponent.button(theme: String, value: String, content: String) =
 	apply { elements += ButtonElement(theme, value, TextPlainText(content)) }
@@ -85,4 +86,4 @@ fun ContextComponent.text(content: String) =
 fun ContextComponent.kMarkdown(content: String) =
 	addContent(TextKMarkdown(content))
 fun ContextComponent.image(imageSrc: String) =
-	addContent(ElementImage(imageSrc))
+	addContent(ImageElement(imageSrc))
