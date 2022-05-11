@@ -1,5 +1,7 @@
 package kaikt.websocket.yeti.command
 
+import kaikt.websocket.event.direct.PrivateKMarkdownMessageEvent
+import kaikt.websocket.event.guild.GuildKMarkdownMessageEvent
 import kaikt.websocket.yeti.YetiBot
 import kaikt.websocket.yeti.sender.Sender
 import kaikt.websocket.yeti.sender.guild.Channel
@@ -26,7 +28,9 @@ sealed class MessageContext(
 	val authorId: String,
 	val senderId: String,
 	val messageId: String,
-	val messageTimestamp: Long
+	val messageTimestamp: Long,
+
+	open val messageSource: Any?
 )
 
 /**
@@ -43,8 +47,10 @@ class DirectMessageContext(
 	authorId: String,
 	chatCode: String,
 	messageId: String,
-	messageTimestamp: Long
-) : MessageContext(bot, content, sender, authorSender, authorId, chatCode, messageId, messageTimestamp)
+	messageTimestamp: Long,
+
+	override val messageSource: PrivateKMarkdownMessageEvent
+) : MessageContext(bot, content, sender, authorSender, authorId, chatCode, messageId, messageTimestamp, messageSource)
 
 /**
  * @param guildId 服务器ID
@@ -73,8 +79,10 @@ class ChannelMessageContext(
 	val mention: List<String>,
 	val mentionAll: Boolean,
 	val mentionHere: Boolean,
-	val mentionRoles: List<String>
-) : MessageContext(bot, content, sender, authorSender, authorId, senderId, messageId, messageTimestamp)
+	val mentionRoles: List<String>,
+
+	override val messageSource: GuildKMarkdownMessageEvent
+) : MessageContext(bot, content, sender, authorSender, authorId, senderId, messageId, messageTimestamp, messageSource)
 
 fun MessageContext.reply(content: String) = sender.sendMessage(content)
 fun MessageContext.replyQuote(content: String) = sender.sendMessage(content, quote = messageId)
