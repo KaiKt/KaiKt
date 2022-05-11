@@ -1,9 +1,7 @@
 package kaikt.websocket.yeti.command
 
 import kaikt.websocket.event.direct.PrivateKMarkdownMessageEvent
-import kaikt.websocket.event.direct.PrivateTextMessageEvent
 import kaikt.websocket.event.guild.GuildKMarkdownMessageEvent
-import kaikt.websocket.event.guild.GuildTextMessageEvent
 import kaikt.websocket.yeti.*
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
