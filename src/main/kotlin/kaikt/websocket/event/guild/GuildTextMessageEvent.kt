@@ -5,6 +5,7 @@ import kaikt.websocket.KaiClient
 import kaikt.websocket.hazelnut.*
 import kaikt.websocket.hazelnut.guild.*
 
+@Deprecated("开黑啦已经移除 Text 消息，并全部转为 KMarkdown 消息", replaceWith = ReplaceWith("GuildKMarkdownMessageEvent"))
 data class GuildTextMessageEvent(
 	val client: KaiClient,
 

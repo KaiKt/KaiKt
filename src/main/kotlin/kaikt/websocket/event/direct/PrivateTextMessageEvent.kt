@@ -6,6 +6,7 @@ import kaikt.websocket.hazelnut.*
 import kaikt.websocket.hazelnut.direct.HPrivateMessage
 import kaikt.websocket.hazelnut.direct.HUserChat
 
+@Deprecated("开黑啦已经移除 Text 消息，并全部转为 KMarkdown 消息", replaceWith = ReplaceWith("PrivateKMarkdownMessageEvent"))
 data class PrivateTextMessageEvent(
 	val client: KaiClient,
 
