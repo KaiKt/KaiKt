@@ -1,3 +1,3 @@
-package kaikt.cardmsg
+package kaikt.api.entity.dsl.cardmsg
 
 class DividerComponent: CardComponent("divider")

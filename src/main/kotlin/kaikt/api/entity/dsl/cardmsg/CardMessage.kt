@@ -1,8 +1,7 @@
-package kaikt.cardmsg
+package kaikt.api.entity.dsl.cardmsg
 
 import com.google.gson.reflect.TypeToken
-import kaikt.api.KaiApi
-import kaikt.cardmsg.entity.*
+import kaikt.api.entity.dsl.cardmsg.entity.*
 import kaikt.gson
 
 class CardMessage(

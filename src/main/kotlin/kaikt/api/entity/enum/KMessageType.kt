@@ -10,7 +10,7 @@ enum class KMessageType(val i: Int) {
 	CardMessage(10);
 
 	fun Int.enumMessageType(): KMessageType {
-		values().forEach {
+		entries.forEach {
 			if(it.i == this) {
 				return it
 			}
@@ -20,4 +20,4 @@ enum class KMessageType(val i: Int) {
 
 }
 
-fun Int.toMessageType() = KMessageType.values().firstOrNull { it.i == this }
+fun Int.toMessageType() = KMessageType.entries.firstOrNull { it.i == this }

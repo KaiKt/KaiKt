@@ -1,6 +1,6 @@
-package kaikt.cardmsg
+package kaikt.api.entity.dsl.cardmsg
 
-import kaikt.cardmsg.entity.Element
+import kaikt.api.entity.dsl.cardmsg.entity.Element
 
 /**
  * 图片模块大图集

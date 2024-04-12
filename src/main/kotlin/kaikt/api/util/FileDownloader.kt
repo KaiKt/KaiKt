@@ -56,10 +56,10 @@ object FileDownloader {
 
 }
 
-fun uploadAsset(src: String, api: KaiApi.Asset = KaiApi.unspecifiedInstance.Asset()): String =
+internal fun uploadAsset(src: String, api: KaiApi.Asset = KaiApi.unspecifiedInstance.Asset()): String =
 	uploadAsset(FileDownloader.download(src), api)
 
-fun uploadAsset(file: File, api: KaiApi.Asset = KaiApi.unspecifiedInstance.Asset()): String {
+internal fun uploadAsset(file: File, api: KaiApi.Asset = KaiApi.unspecifiedInstance.Asset()): String {
 	assert(!file.exists()) { "File does not exist. [$file]" }
 	assert(!file.isFile) { "File does not a file. [$file]" }
 

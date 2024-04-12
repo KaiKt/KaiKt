@@ -1,7 +1,7 @@
-package kaikt.cardmsg
+package kaikt.api.entity.dsl.cardmsg
 
-import kaikt.cardmsg.entity.Text
-import kaikt.cardmsg.entity.TextPlainText
+import kaikt.api.entity.dsl.cardmsg.entity.Text
+import kaikt.api.entity.dsl.cardmsg.entity.TextPlainText
 
 /**
  * 内容模块（单文本型）

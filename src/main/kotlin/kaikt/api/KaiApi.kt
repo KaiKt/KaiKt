@@ -19,10 +19,9 @@ import org.intellij.lang.annotations.MagicConstant
 import org.slf4j.LoggerFactory
 import java.io.File
 
-private val log = LoggerFactory.getLogger("KaiApi")
-
 class KaiApi(private val token: KToken) {
 
+	private val log = LoggerFactory.getLogger("KaiApi")
 	private val cli = OkHttpClient.Builder().build()
 
 	private val mediaTypeJson = "application/json;charset=UTF-8".toMediaType()
@@ -39,7 +38,7 @@ class KaiApi(private val token: KToken) {
 		endpoint: String,
 		query: Map<String, Any> = valueNotNullMapOf(),
 		headers: Map<String, String> = valueNotNullMapOf(),
-		noCompress: Boolean = true
+		noCompress: Boolean = true,
 	): Response {
 
 		// Fix '/'
@@ -53,7 +52,7 @@ class KaiApi(private val token: KToken) {
 
 		val url = HttpUrl.Builder()
 			.scheme("https")
-			.host("www.kaiheila.cn")
+			.host("www.kookapp.cn")
 			.addPathSegments(finalEndpoint)
 			.addQueryParameter("compress", (if(noCompress) "0" else "1"))
 			.apply {
@@ -81,7 +80,7 @@ class KaiApi(private val token: KToken) {
 		endpoint: String,
 		body: RequestBody,
 		headers: Map<String, String> = valueNotNullMapOf(),
-		noCompress: Boolean = true
+		noCompress: Boolean = true,
 	): Response {
 
 		// Fix '/'
@@ -92,7 +91,7 @@ class KaiApi(private val token: KToken) {
 
 		val url = HttpUrl.Builder()
 			.scheme("https")
-			.host("www.kaiheila.cn")
+			.host("www.kookapp.cn")
 			.addPathSegments(finalEndpoint)
 			.addQueryParameter("compress", (if(noCompress) "0" else "1"))
 			.build()
@@ -115,7 +114,7 @@ class KaiApi(private val token: KToken) {
 		endpoint: String,
 		body: String = "",
 		headers: Map<String, String> = valueNotNullMapOf(),
-		noCompress: Boolean = true
+		noCompress: Boolean = true,
 	) = doPost(endpoint, body.toRequestBody("application/json".toMediaType()), headers, noCompress).also {
 		log.debug("[POST] $endpoint")
 		log.debug("[POST] $body")
@@ -125,14 +124,16 @@ class KaiApi(private val token: KToken) {
 		endpoint: String,
 		body: Map<*, *>,
 		headers: Map<String, String> = valueNotNullMapOf(),
-		noCompress: Boolean = true
+		noCompress: Boolean = true,
 	) = doPost(endpoint, gson.toJson(body), headers, noCompress)
 
 	override fun toString(): String {
 		return "KaiApi(token=$token)"
 	}
 
-	inner class Guild {
+	val guild by lazy { Guild() }
+
+	inner class Guild internal constructor() {
 
 		/**
 		 * 获取当前用户加入的服务器列表
@@ -154,7 +155,10 @@ class KaiApi(private val token: KToken) {
 		 * @param guildId 服务器ID
 		 * @param conf 请求设置
 		 */
-		fun getGuildUserList(guildId: String, conf: KGuildUserListRequest.() -> Unit = {}): KResponse<KGuildUserListData> {
+		fun getGuildUserList(
+			guildId: String,
+			conf: KGuildUserListRequest.() -> Unit = {},
+		): KResponse<KGuildUserListData> {
 			return doGet(
 				"/api/v3/guild/user-list",
 				KGuildUserListRequest(guildId).apply(conf).toQueryMap()
@@ -227,7 +231,7 @@ class KaiApi(private val token: KToken) {
 		fun postGuildMuteCreate(
 			guildId: String,
 			userId: String,
-			@MagicConstant(valuesFromClass = KGuildMuteType::class) type: Int
+			@MagicConstant(valuesFromClass = KGuildMuteType::class) type: Int,
 		): KBasicResponse {
 			return doPost(
 				"/api/v3/guild-mute/create",
@@ -248,7 +252,7 @@ class KaiApi(private val token: KToken) {
 		fun postGuildMuteDelete(
 			guildId: String,
 			userId: String,
-			@MagicConstant(valuesFromClass = KGuildMuteType::class) type: Int
+			@MagicConstant(valuesFromClass = KGuildMuteType::class) type: Int,
 		): KBasicResponse {
 			return doPost(
 				"/api/v3/guild-mute/delete",
@@ -262,7 +266,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class Channel {
+	val channel by lazy { Channel() }
+
+	inner class Channel internal constructor() {
 
 		/**
 		 * 获取服务器频道列表
@@ -299,7 +305,7 @@ class KaiApi(private val token: KToken) {
 		fun postChannelCreate(
 			guildId: String,
 			name: String,
-			request: KChannelCreateRequest.() -> Unit = {}
+			request: KChannelCreateRequest.() -> Unit = {},
 		): KResponse<KChannelViewDefinition> {
 			val body = KChannelCreateRequest(guildId, name).apply(request).body
 			return doPost(
@@ -372,7 +378,7 @@ class KaiApi(private val token: KToken) {
 			channelId: String,
 			roleIdOrUserId: RoleIdOrUserId,
 			allow: Int? = null,
-			deny: Int? = null
+			deny: Int? = null,
 		): KResponse<KChannelRoleUpdateData> {
 			return doPost(
 				"/api/v3/channel-role/update",
@@ -404,14 +410,19 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class Message {
+	val message by lazy { Message() }
+
+	inner class Message internal constructor() {
 
 		/**
 		 * 获取频道聊天消息列表
 		 * @param channelId 频道ID
 		 * @param request 查询细节设置
 		 */
-		fun getMessageList(channelId: String, request: KMessageListRequest.() -> Unit = {}): KListResponse<KMessageDefinition> {
+		fun getMessageList(
+			channelId: String,
+			request: KMessageListRequest.() -> Unit = {},
+		): KListResponse<KMessageDefinition> {
 			val query = KMessageListRequest(channelId).apply(request).query
 			return doGet(
 				"/api/v3/message/list",
@@ -428,7 +439,7 @@ class KaiApi(private val token: KToken) {
 		fun postMessageCreate(
 			channelId: String,
 			content: String,
-			request: KMessageCreateRequest.() -> Unit = {}
+			request: KMessageCreateRequest.() -> Unit = {},
 		): KResponse<KMessageCreateData> {
 			val body = KMessageCreateRequest(channelId, content).apply(request).body
 			return doPost(
@@ -446,7 +457,7 @@ class KaiApi(private val token: KToken) {
 		fun postMessageUpdate(
 			msgId: String,
 			content: String,
-			request: KMessageUpdateRequest.() -> Unit = {}
+			request: KMessageUpdateRequest.() -> Unit = {},
 		): KBasicResponse {
 			val body = KMessageUpdateRequest(msgId, content).apply(request).body
 			return doPost(
@@ -515,7 +526,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class UserChat {
+	val userChat by lazy { UserChat() }
+
+	inner class UserChat internal constructor() {
 
 		/**
 		 * 获取私聊列表
@@ -567,7 +580,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class DirectMessage {
+	val directMessage by lazy { DirectMessage() }
+
+	inner class DirectMessage internal constructor() {
 
 		/**
 		 * 获取私聊消息列表
@@ -576,7 +591,7 @@ class KaiApi(private val token: KToken) {
 		 */
 		fun getDirectMessageList(
 			targetIdOrChatCode: TargetIdOrChatCode,
-			request: KDirectMessageRequest.() -> Unit = {}
+			request: KDirectMessageRequest.() -> Unit = {},
 		): KListResponse<KMessageDefinition> {
 			val query = KDirectMessageRequest(targetIdOrChatCode).apply(request).query
 			return doGet(
@@ -594,7 +609,7 @@ class KaiApi(private val token: KToken) {
 		fun postDirectMessageCreate(
 			targetIdOrChatCode: TargetIdOrChatCode,
 			content: String,
-			request: KDirectMessageCreateRequest.() -> Unit = {}
+			request: KDirectMessageCreateRequest.() -> Unit = {},
 		): KResponse<KMessageCreateData> {
 			val body = KDirectMessageCreateRequest(targetIdOrChatCode, content).apply(request).body
 			return doPost(
@@ -682,7 +697,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class Gateway {
+	val gateway by lazy { Gateway() }
+
+	inner class Gateway internal constructor() {
 
 		/**
 		 * 获取网关连接地址（用于 WebSocket 方式）
@@ -693,7 +710,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class User {
+	val user by lazy { User() }
+
+	inner class User internal constructor() {
 
 		/**
 		 * 获取当前登录的用户的信息
@@ -719,7 +738,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class Asset {
+	val asset by lazy { Asset() }
+
+	inner class Asset internal constructor() {
 
 		/**
 		 * 上传资源
@@ -761,11 +782,13 @@ class KaiApi(private val token: KToken) {
 
 	}
 
+	val guildRole by lazy { GuildRole() }
+
 	/**
 	 * 增删查改服务器身分组。
 	 * 单独管理某频道的身分组权限请前往 [Channel][KaiApi.Channel] 模块。
 	 */
-	inner class GuildRole {
+	inner class GuildRole internal constructor() {
 
 		/**
 		 * 获取服务器身分组列表
@@ -773,7 +796,11 @@ class KaiApi(private val token: KToken) {
 		 * @param page 目标页数
 		 * @param pageSize 每页数据量
 		 */
-		fun getGuildRoleList(guildId: String, page: Int? = null, pageSize: Int? = null): KListResponse<KRoleDefinition> {
+		fun getGuildRoleList(
+			guildId: String,
+			page: Int? = null,
+			pageSize: Int? = null,
+		): KListResponse<KRoleDefinition> {
 			return doGet(
 				"/api/v3/guild-role/list",
 				valueNotNullMapOf(
@@ -808,7 +835,7 @@ class KaiApi(private val token: KToken) {
 		fun postGuildRoleUpdate(
 			guildId: String,
 			roleId: String,
-			request: KGuildRoleUpdateRequest.() -> Unit = {}
+			request: KGuildRoleUpdateRequest.() -> Unit = {},
 		): KResponse<KRoleDefinition> {
 			val body = KGuildRoleUpdateRequest(guildId, roleId).apply(request).body
 			return doPost(
@@ -868,7 +895,9 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class GuildEmoji {
+	val guildEmoji by lazy { GuildEmoji() }
+
+	inner class GuildEmoji internal constructor() {
 
 		/**
 		 * 获取服务器表情列表
@@ -930,13 +959,19 @@ class KaiApi(private val token: KToken) {
 
 	}
 
-	inner class Invite {
+	val invite by lazy { Invite() }
+
+	inner class Invite internal constructor() {
 
 		/**
 		 * 获取邀请列表
 		 * @param guildOrChannel 服务器或频道
 		 */
-		fun getInviteList(guildOrChannel: GuildOrChannel, page: Int? = null, pageSize: Int? = null): KListResponse<KInviteData> {
+		fun getInviteList(
+			guildOrChannel: GuildOrChannel,
+			page: Int? = null,
+			pageSize: Int? = null,
+		): KListResponse<KInviteData> {
 			return doGet(
 				"/api/v3/invite/list",
 				valueNotNullMapOf(
@@ -956,7 +991,7 @@ class KaiApi(private val token: KToken) {
 		fun postInviteCreate(
 			guildOrChannel: GuildOrChannel,
 			expireTime: InviteDuration? = null,
-			expireUsageCounter: InviteUsageCounter? = null
+			expireUsageCounter: InviteUsageCounter? = null,
 		): KResponse<KInviteCreateData> {
 			return doPost(
 				"/api/v3/invite/create",
@@ -984,7 +1019,9 @@ class KaiApi(private val token: KToken) {
 		}
 	}
 
-	inner class Blacklist {
+	val blacklist by lazy { Blacklist() }
+
+	inner class Blacklist internal constructor() {
 
 		/**
 		 * 获取服务器黑名单列表
@@ -1006,7 +1043,12 @@ class KaiApi(private val token: KToken) {
 		 * @param remark 加入黑名单原因
 		 * @param delMessageDays 删除最近几天的消息（最大7天，默认为0）
 		 */
-		fun postBlacklistCreate(guildId: String, targetId: String, remark: String? = null, delMessageDays: Int? = null): KBasicResponse {
+		fun postBlacklistCreate(
+			guildId: String,
+			targetId: String,
+			remark: String? = null,
+			delMessageDays: Int? = null,
+		): KBasicResponse {
 			return doPost(
 				"/api/v3/blacklist/create",
 				valueNotNullMapOf(
@@ -1034,7 +1076,9 @@ class KaiApi(private val token: KToken) {
 		}
 	}
 
-	inner class Badge {
+	val badge by lazy { Badge() }
+
+	inner class Badge internal constructor() {
 
 		/**
 		 * 获取服务器 Badge
@@ -1074,7 +1118,6 @@ class KaiApi(private val token: KToken) {
  *
  */
 private fun JsonElement.asResponseData(): KaiResponseJsonObject {
-	log.debug(this.toString())
 	if(this.isJsonObject) {
 		return this.asJsonObject
 	} else {
@@ -1092,14 +1135,15 @@ private fun Response.toJson(): KaiResponseJsonObject = JsonParser.parseReader(th
 /**
  * 开黑啦Api返回回来的数据
  */
-typealias KaiResponseJsonObject = JsonObject
+internal typealias KaiResponseJsonObject = JsonObject
 
-private inline fun <reified T> KaiResponseJsonObject.getTyped(): T = gson.fromJson(this, (object : TypeToken<T>() {}.type))
+private inline fun <reified T> KaiResponseJsonObject.getTyped(): T =
+	gson.fromJson(this, (object : TypeToken<T>() {}.type))
 
 private fun <K, V> Map<K, V>.toJson(): String = gson.toJson(this)
 
 // Public
 
-fun Boolean.toInt() = if(this) 1 else 0
+internal fun Boolean.toInt() = if(this) 1 else 0
 
-fun Boolean?.toInt() = this?.toInt()
+internal fun Boolean?.toInt() = this?.toInt()

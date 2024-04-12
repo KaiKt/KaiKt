@@ -11,16 +11,18 @@ class IntBoolTypeAdapter : TypeAdapter<IntBool>() {
 
 	override fun read(reader: JsonReader): IntBool? {
 		val peek = reader.peek()
-		if(peek == JsonToken.NULL) {
-			reader.nextNull()
-			return null
+		when(peek) {
+			JsonToken.NULL -> {
+				reader.nextNull()
+				return null
+			}
+			JsonToken.NUMBER -> {
+				return reader.nextInt().toIntBool()
+			}
+			JsonToken.BOOLEAN -> {
+				return reader.nextBoolean().toIntBool()
+			}
+			else -> return reader.nextString().toIntBool()
 		}
-		else if(peek == JsonToken.NUMBER) {
-			return reader.nextInt().toIntBool()
-		}
-		else if(peek == JsonToken.BOOLEAN) {
-			return reader.nextBoolean().toIntBool()
-		}
-		return reader.nextString().toIntBool()
 	}
 }

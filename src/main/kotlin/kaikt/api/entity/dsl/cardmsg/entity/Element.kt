@@ -1,4 +1,4 @@
-package kaikt.cardmsg.entity
+package kaikt.api.entity.dsl.cardmsg.entity
 
 import kaikt.api.util.uploadAsset
 

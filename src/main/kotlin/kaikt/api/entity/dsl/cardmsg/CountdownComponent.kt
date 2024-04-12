@@ -1,4 +1,4 @@
-package kaikt.cardmsg
+package kaikt.api.entity.dsl.cardmsg
 
 open class CountdownComponent internal constructor(val mode: String): CardComponent("countdown")
 
