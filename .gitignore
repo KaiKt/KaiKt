@@ -8,3 +8,5 @@ mainModule.iml
 
 # Runtime & Debug
 latest.log
+build/
+.gradle/

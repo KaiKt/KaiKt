@@ -3,7 +3,7 @@ package kaikt.websocket.yeti
 import kaikt.api.KToken
 import kaikt.api.KaiApi
 import kaikt.api.entity.definition.KUserDefinition
-import kaikt.websocket.KaiClient
+import kaikt.websocket.EventBusKaiClient
 import kaikt.websocket.yeti.command.CommandManager
 import kaikt.websocket.yeti.sender.guild.ChannelManager
 import kaikt.websocket.yeti.sender.guild.GuildManager
@@ -17,7 +17,7 @@ class YetiBot(config: YetiBotConfig) {
 	private val logger = LoggerFactory.getLogger(config.loggerName)
 
 	val kApi: KaiApi
-	val kCli: KaiClient
+	val kCli: EventBusKaiClient
 
 	internal val userManager: UserManager
 	internal val guildManager: GuildManager
@@ -37,7 +37,7 @@ class YetiBot(config: YetiBotConfig) {
 		this.kApi = token.toApi()
 
 		logger.info("正在配置 WS 客户端")
-		this.kCli = KaiClient(kApi)
+		this.kCli = EventBusKaiClient(kApi)
 
 		logger.info("正在配置 InstManagers")
 		this.userManager = UserManager(this)
@@ -52,7 +52,7 @@ class YetiBot(config: YetiBotConfig) {
 		this.commandManager = CommandManager(this)
 
 		logger.info("正在启动客户端监听")
-		this.kCli.connect()
+		this.kCli.initialize()
 	}
 
 }

@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder
 import kaikt.api.util.IntBool
 import kaikt.api.util.IntBoolTypeAdapter
 
-class KaiKt {
-}
+object KaiKt
 
-val gson: Gson = GsonBuilder().registerTypeAdapter(IntBool::class.java, IntBoolTypeAdapter()).create()
+internal val gson: Gson = GsonBuilder().registerTypeAdapter(IntBool::class.java, IntBoolTypeAdapter()).create()
